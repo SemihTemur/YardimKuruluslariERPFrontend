@@ -1,0 +1,50 @@
+/* Reset CSS */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth; /* Yumuşak kaydırma */
+}
+
+body {
+  line-height: 1.5;
+  font-family: Arial, sans-serif; /* Tarayıcı varsayılan fontu yerine bir font tanımla */
+  -webkit-font-smoothing: antialiased; /* MacOS için daha düzgün yazı render'ı */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
