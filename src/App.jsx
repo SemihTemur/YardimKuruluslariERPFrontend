@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles/app.css";
-import Sidebar from "./components/Sidebar/Sidebar";
+import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import Header from "./components/Header/Header.jsx";
 import { RouterConfig } from "./routes/RouterConfig";
 import { Box } from "@mui/material";

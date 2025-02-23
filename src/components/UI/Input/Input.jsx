@@ -1,7 +1,15 @@
 import React from "react";
 
-export const Input = ({ type }) => {
-  return <input type={type} className="form__input"></input>;
+export const Input = ({ type, name, value, onChange }) => {
+  return (
+    <input
+      type={type}
+      name={name}
+      onChange={onChange}
+      value={value}
+      className="form__input"
+    />
+  );
 };
 
 export default Input;

@@ -19,8 +19,14 @@ const SidebarSubItem = ({
     setActiveChildIndex(null);
   };
 
+  //If child children have children, if there is no div, link
+  const Wrapper = subItem.subItems ? "div" : Link;
+
   return (
-    <Link to="/aile/ekle" className="navbar__sub-item ">
+    <Wrapper
+      to={subItem.subItems ? undefined : subItem.url}
+      className="navbar__sub-item "
+    >
       <div
         className={
           subItem.subItems
@@ -70,7 +76,11 @@ const SidebarSubItem = ({
           } `}
         >
           {subItem.subItems.map((childItem, childIndex) => (
-            <li key={childIndex} className="navbar__sub__child-item">
+            <Link
+              to={childItem.url}
+              key={childIndex}
+              className="navbar__sub__child-item"
+            >
               <div>
                 <p
                   className={`navbar__sub__child-text ${
@@ -88,11 +98,11 @@ const SidebarSubItem = ({
                   <MdArrowForwardIos className="navbar__button--none" />
                 )}
               </div>
-            </li>
+            </Link>
           ))}
         </ul>
       )}
-    </Link>
+    </Wrapper>
   );
 };
 

@@ -67,7 +67,7 @@
 .navbar__sub-text {
   color: #f0f0f0;
   width: 110px;
-  font-size: 14px;
+  font-size: 13px;
   height: 19px;
 }
 
@@ -92,6 +92,7 @@
   overflow: hidden;
   transition: opacity 0.5s ease-in-out, visibility 0.5s,
     max-height 0.5s ease-in-out;
+  margin-left: 20px;
 }
 
 .navbar__sub__child--open {
@@ -125,7 +126,7 @@
 .navbar__sub__child-text {
   width: 140px;
   color: #e0e0e0;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .navbar__sub__child-text:hover {
