@@ -1,6 +1,7 @@
 import React from "react";
-import FormikWrapper from "../../formik&yup/FormikWrapper";
+import FormikWrapper from "../../components/Form/FormikWrapper";
 import { familyInitialValues } from "../../formik&yup/initalValues";
+import { familyYup } from "../../formik&yup/yup";
 
 import useApi from "../../hooks/useApi ";
 import FamilyForm from "../../components/Form/FamilyForm";
@@ -16,8 +17,12 @@ const FamilyAddPage = () => {
   return (
     <div className="form-container">
       <h1>Aile Ekle</h1>
-      <FormikWrapper process={saveFamily} initialValues={familyInitialValues}>
-        {(formik) => <FamilyForm formik={formik} />}
+      <FormikWrapper
+        process={saveFamily}
+        initialValues={familyInitialValues}
+        yup={familyYup}
+      >
+        <FamilyForm />
       </FormikWrapper>
     </div>
   );

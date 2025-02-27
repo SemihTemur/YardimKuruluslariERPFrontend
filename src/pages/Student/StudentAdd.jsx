@@ -1,35 +1,29 @@
 import React from "react";
-import Label from "../../components/UI/Label/Label";
-import Input from "../../components/UI/Input/Input";
-import { useState } from "react";
-import Select from "../../components/UI/Select/Select";
-import Button from "../../components/UI/Button/Button";
-import cities from "../../constants/cityItem";
-import genders from "../../constants/genders";
-import { educationLevel } from "../../constants/educationLevel";
-import FormikWrapper from "../../formik&yup/FormikWrapper";
+import FormikWrapper from "../../components/Form/FormikWrapper";
+import { studentInitialValues } from "../../formik&yup/initalValues";
+import { studentYup } from "../../formik&yup/yup";
+import StudentForm from "../../components/Form/StudentForm";
+import useApi from "../../hooks/useApi ";
 
 export const StudentAdd = () => {
-  const [selectCity, setSelectCity] = useState("");
-  const [selectGender, setSelectGender] = useState("");
-  const [selectEducation, setSelectEducation] = useState("");
+  const { makeRequest } = useApi();
 
-  const handleSelectCity = (e) => {
-    setSelectCity(e.target.value);
-  };
-
-  const handleSelectGender = (e) => {
-    setSelectGender(e.target.value);
-  };
-
-  const handleSelectEducation = (e) => {
-    setSelectEducation(e.target.value);
+  const saveStudent = async (values, { resetForm }) => {
+    await makeRequest("post", "saveStudent", values);
+    resetForm();
+    console.log(values);
   };
 
   return (
     <div className="form-container">
       <h1>Öğrenci Ekle</h1>
-      <FormikWrapper></FormikWrapper>
+      <FormikWrapper
+        process={saveStudent}
+        initialValues={studentInitialValues}
+        yup={studentYup}
+      >
+        <StudentForm formik={formik} />
+      </FormikWrapper>
     </div>
   );
 };

@@ -24,6 +24,10 @@ export const familyYup = Yup.object({
 
   email: Yup.string()
     .email("Geçerli bir email giriniz")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@(gmail\.com)$/,
+      "Sadece @gmail.com adresi kabul edilmektedir"
+    )
     .required("Email zorunludur"),
 
   address: Yup.object({
@@ -51,20 +55,20 @@ export const familyYup = Yup.object({
 
 export const studentYup = Yup.object({
   name: Yup.string()
-    .min(3, "Aile adı en az 3 harften oluşmalı")
+    .min(3, "Öğrenci adı en az 3 harften oluşmalı")
     .matches(
       /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/,
-      "Aile adı yalnızca harflerden oluşmalıdır"
+      "Öğrenci adı yalnızca harflerden oluşmalıdır"
     )
-    .required("Aile adı zorunludur"),
+    .required("Öğrenci adı zorunludur"),
 
   surname: Yup.string()
-    .min(3, "Aile adı en az 3 harften oluşmalı")
+    .min(3, "Öğrenci soyadı en az 3 harften oluşmalı")
     .matches(
       /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/,
-      "Aile adı yalnızca harflerden oluşmalıdır"
+      "Öğrenci soyadı yalnızca harflerden oluşmalıdır"
     )
-    .required("Aile adı zorunludur"),
+    .required("Öğrenci soyadı zorunludur"),
 
   age: Yup.number()
     .typeError("Yaş sadece rakam olmalıdır")
@@ -74,30 +78,8 @@ export const studentYup = Yup.object({
     .max(100, "Yaş en fazla 100 olmalıdır")
     .required("Yaş alanı zorunludur"),
 
-  tc: Yup.string()
-    .matches(/^\d{11}$/, "TC Kimlik Numarası 11 haneli olmalıdır") // Sadece 11 rakam
-    .test("is-valid-tc", "Geçersiz TC Kimlik Numarası", (value) => {
-      if (!value) return false;
-
-      // Algoritma kontrolü (ilk basamağın 0 olmaması, geçerli bir numara olup olmadığı)
-      const arr = value.split("").map((digit) => parseInt(digit, 10));
-
-      // İlk rakam 0 olamaz
-      if (arr[0] === 0) return false;
-
-      // 10. basamağın 10'luk toplamına göre hesaplanması
-      const check1 =
-        arr
-          .slice(0, 10)
-          .reduce((acc, num, idx) => acc + (idx % 2 === 0 ? num : 0), 0) % 10;
-      const check2 =
-        arr
-          .slice(1, 9)
-          .reduce((acc, num, idx) => acc + (idx % 2 === 0 ? num : 0), 0) % 10;
-
-      // Algoritma: 10. ve 11. basamak kontrolü
-      return check1 === arr[9] && check2 === arr[10];
-    })
+  tckn: Yup.string()
+    .matches(/^[1-9]\d{10}$/, "TC Kimlik Numarası 11 haneli olmalıdır") // 11 haneli ve 0 ile başlamayan
     .required("TC Kimlik Numarası zorunludur"),
 
   phoneNumber: Yup.string()
@@ -109,14 +91,80 @@ export const studentYup = Yup.object({
 
   email: Yup.string()
     .email("Geçerli bir email giriniz")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@(gmail\.com)$/,
+      "Sadece @gmail.com adresi kabul edilmektedir"
+    )
     .required("Email zorunludur"),
 
-  gender: Yup.string().required("Cinsiyet seçmek zorunludur"),
+  genderType: Yup.string().required("Cinsiyet seçmek zorunludur"),
 
-  education: Yup.string().required("Eğitim seviyesi seçmek zorunludur"),
+  educationLevel: Yup.string().required("Eğitim seviyesi seçmek zorunludur"),
 
   address: Yup.object({
     city: Yup.string().required("İl seçmek zorunludur"),
+    district: Yup.string()
+      .required("İlçe zorunludur")
+      .matches(/^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/),
+    neighborhood: Yup.string()
+      .required("Mahalle zorunludur")
+      .matches(/^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/),
+    street: Yup.string()
+      .required("Sokak zorunludur")
+      .matches(/^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/),
+  }),
+});
+
+export const categoryYup = Yup.object({
+  itemName: Yup.string()
+    .required("Ürün adı zorunludur")
+    .min(3, "Ürün en az 3 karakterli olmalıdır")
+    .matches(
+      /^[^0-9]*$/,
+      "Ürün adı sayı içeremez (Sadece harf ve özel karakter girilebilir)"
+    ),
+  unit: Yup.string()
+    .required("Birim zorunludur")
+    .min(3, "Adet en az 3 karakterli olmalıdır")
+    .matches(
+      /^[^0-9]*$/,
+      "Ürün adı sayı içeremez (Sadece harf ve özel karakter girilebilir)"
+    ),
+});
+
+export const donorYup = Yup.object({
+  firstName: Yup.string()
+    .min(3, "Bağışçı adı en az 3 harften oluşmalı")
+    .matches(
+      /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/,
+      "Bağışçı adı yalnızca harflerden oluşmalıdır"
+    )
+    .required("Bağışçı adı zorunludur"),
+
+  lastName: Yup.string()
+    .min(3, "Bağışçı soyadı en az 3 harften oluşmalı")
+    .matches(
+      /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/,
+      "Bağışçı soyadı yalnızca harflerden oluşmalıdır"
+    )
+    .required("Bağışçı soyadı zorunludur"),
+
+  phoneNumber: Yup.string()
+    .matches(
+      /^0[5-7]\d{9}$/,
+      "Geçerli bir telefon numarası giriniz (0 ile başlamalı, 11 haneli olmalı)"
+    )
+    .required("Telefon numarası zorunludur"),
+
+  email: Yup.string()
+    .email("Geçerli bir email giriniz")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@(gmail\.com)$/,
+      "Sadece @gmail.com adresi kabul edilmektedir"
+    )
+    .required("Email zorunludur"),
+
+  address: Yup.object({
     district: Yup.string()
       .required("İlçe zorunludur")
       .matches(/^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/),

@@ -16,11 +16,31 @@ export const studentInitialValues = {
   name: "",
   surname: "",
   age: "",
-  tc: "",
+  tckn: "",
   phoneNumber: "",
   email: "",
-  gender: "Erkek",
-  education: "Lise",
+  genderType: "Erkek",
+  educationLevel: "Lise",
+  address: {
+    city: "Adana",
+    district: "",
+    neighborhood: "",
+    street: "",
+    userType: "Öğrenci",
+  },
+};
+
+export const categoryInitialValues = {
+  itemName: "",
+  unit: "",
+};
+
+export const donorInitialValues = {
+  firstName: "",
+  lastName: "",
+  phoneNumber: "",
+  email: "",
+  genderType: "",
   address: {
     city: "Adana",
     district: "",
