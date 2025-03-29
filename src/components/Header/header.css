@@ -15,10 +15,17 @@
   justify-content: center;
 }
 
+.header__icon-container > svg {
+  cursor: pointer;
+  color: #ffff !important;
+  fill: #ffff !important;
+}
+
 .menu-icon {
   width: 30px !important;
   height: 30px !important;
   cursor: pointer;
+  color: #ffff !important;
 }
 
 .header__content {
@@ -32,12 +39,15 @@
   width: 25px !important;
   height: 25px !important;
   cursor: pointer;
+  color: #ffff !important;
 }
 
-.saving-icon {
+#saving-icon {
   width: 25px !important;
   height: 25px !important;
   cursor: pointer;
+  color: #ffff !important;
+  fill: #ffff !important;
 }
 
 .person-content {
@@ -46,18 +56,24 @@
   justify-content: center;
   gap: 5px;
   margin-right: 15px;
+  color: #ffff !important;
+  fill: #ffff !important;
 }
 
-.person-icon {
+#person-icon {
   width: 25px !important;
   height: 25px !important;
   cursor: pointer;
+  color: #ffff !important;
+  fill: #ffff !important;
 }
 
-.logout-icon {
+#logout-icon {
   width: 25px !important;
   height: 25px !important;
   cursor: pointer;
+  color: #ffff !important;
+  fill: #ffff !important;
 }
 
 @media screen and (max-width: 500px) {

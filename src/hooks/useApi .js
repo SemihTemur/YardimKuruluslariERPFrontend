@@ -2,33 +2,28 @@ import { useState } from "react";
 import apiService from "../services/apiService"; // API servis dosyanızı içe aktarın
 
 const useApi = () => {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
 
-  const makeRequest = async (method, endpoint, data = null, id = null) => {
-    setLoading(true);
+  const makeRequest = async (method, endpoint, values = null, id = null) => {
     setError(null);
     try {
       let response;
       if (method === "get") {
         response = await apiService.get(endpoint);
       } else if (method === "post") {
-        response = await apiService.post(endpoint, data);
+        response = await apiService.post(endpoint, values);
       } else if (method === "put") {
-        response = await apiService.put(endpoint, data, id);
+        response = await apiService.put(endpoint, values, id);
       } else if (method === "delete") {
         response = await apiService.delete(endpoint, id);
       }
-      setData(response);
+      return response;
     } catch (err) {
       setError(err);
-    } finally {
-      setLoading(false);
     }
   };
 
-  return { loading, error, data, setData, makeRequest };
+  return { error, makeRequest };
 };
 
 export default useApi;

@@ -3,16 +3,16 @@ import SidebarSubItem from "../SidebarSubItem/SidebarSubItem.jsx";
 import { useState } from "react";
 import { MdArrowForwardIos } from "react-icons/md";
 import "./sidebar-item.css";
-import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 export const SidebarItem = ({
   menuItem,
   setActiveIndex,
   activeIndex,
   index,
+  collapsed,
 }) => {
   const [subActiveIndex, setSubActiveIndex] = useState(null);
-  const { collapsed } = useSelector((store) => store.sidebar);
 
   useEffect(() => {
     if (collapsed) {
@@ -33,8 +33,10 @@ export const SidebarItem = ({
     console.log(subActiveIndex);
   };
 
+  const Wrapper = menuItem.url ? Link : "li";
+
   return (
-    <li className="navbar__list-item">
+    <Wrapper to ={menuItem.subItems ? undefined : menuItem.url} className="navbar__list-item">
       <div
         className={`navbar__item-container ${
           menuItem.subItems && activeIndex === index ? "navbar__item--gray" : ""
@@ -87,7 +89,7 @@ export const SidebarItem = ({
           ))}
         </ul>
       )}
-    </li>
+    </Wrapper>
   );
 };
 

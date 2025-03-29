@@ -1,0 +1,209 @@
+/* Genel container */
+
+.add-container {
+  margin: 0px 0px 20px 10px;
+}
+
+.add-button {
+  background-color: #036dff !important;
+  color: #fff !important;
+}
+
+#add-icon {
+  font-size: 15px;
+  color: #fff !important;
+  fill: #fff !important;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+}
+
+.button-container > * {
+  width: 120px;
+  height: 30px;
+}
+
+/* Tablo container */
+.table-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.table-container__paper-container {
+  max-width: 100%;
+  height: auto;
+  margin-left: 10px;
+}
+
+.paper {
+  height: auto;
+  max-width: auto;
+  background-color: #1f283c;
+  padding: 25px 20px 0px 20px;
+}
+
+.paper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.paper-title h1 {
+  text-align: left;
+  padding: 0px 20px 0px 20px;
+  font-size: 15px;
+}
+
+.paper-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.paper-export__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#excel {
+  color: #2ebb7a;
+  fill: #2ebb7a;
+  width: 60px;
+  height: 30px;
+  cursor: pointer;
+}
+
+#pdf {
+  color: #da171c;
+  fill: #da171c;
+  width: 60px;
+  height: 25px;
+  cursor: pointer;
+}
+
+.paper-actions__search {
+  position: relative;
+  border: 1px solid #1b4f87;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.search {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+}
+
+.paper-input {
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  padding: 0;
+  outline: none;
+  margin-left: 20px;
+}
+
+.delete {
+  color: white;
+  cursor: pointer;
+}
+
+.data-grid {
+  --unstable_DataGrid-radius: 0px !important;
+  background-color: #1f283c !important;
+  color: white !important;
+  border: none !important;
+  padding: 2px !important;
+}
+
+.data-grid .MuiDataGrid-columnHeaders,
+.data-grid .MuiDataGrid-columnHeader,
+.data-grid .MuiDataGrid-row,
+.data-grid .MuiDataGrid-cell,
+.data-grid .MuiDataGrid-footerContainer {
+  background-color: #1f283c;
+  color: white !important;
+}
+
+.data-grid .MuiCheckbox-root,
+.data-grid .MuiDataGrid-sortIcon {
+  color: white !important;
+}
+
+.data-grid .MuiDataGrid-columnSeparator {
+  display: none !important;
+}
+
+.MuiDataGrid-filler {
+  background-color: #1f283c !important;
+}
+
+.MuiDataGrid-scrollbar {
+  background-color: #1f283c !important;
+}
+
+.MuiDataGrid-scrollbarContent {
+  background-color: #1f283c !important;
+}
+
+.css-1m7xks8-MuiDataGrid-root .MuiDataGrid-menuIcon {
+  visibility: visible !important;
+}
+
+.MuiSvgIcon-root {
+  fill: rgb(255 255 255 / 54%) !important;
+  color: #fff !important;
+}
+
+.css-1gak8h1-MuiToolbar-root-MuiTablePagination-toolba {
+  color: #ffff !important;
+}
+
+.MuiTablePagination-toolbar {
+  color: #ffff !important;
+}
+
+.css-1dg7i3d-MuiInputBase-input-MuiOutlinedInput-input {
+  color: #ffff !important;
+}
+
+.css-1ws6qdq-MuiPaper-root-MuiDataGrid-paper {
+  background-color: #1f283c !important;
+  color: #fff !important;
+}
+
+.css-1gtchvp-MuiPaper-root {
+  background-color: #1f283c !important;
+  color: #fff !important;
+}
+
+.css-1dg7i3d-MuiInputBase-input-MuiOutlinedInput-input {
+  color: #fff !important;
+}
+
+.css-1uent87-MuiButtonBase-root-MuiButton-root.Mui-disabled {
+  color: rgb(255 255 255 / 26%) !important;
+}
+
+@media screen and (max-width: 768px) {
+  .paper-title h1 {
+    padding-left: 0px;
+  }
+
+  .paper-input {
+    margin-left: 25%;
+  }
+}

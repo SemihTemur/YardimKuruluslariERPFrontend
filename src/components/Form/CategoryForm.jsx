@@ -3,7 +3,7 @@ import Label from "../../components/UI/Label/Label";
 import Button from "../UI/Button/Button";
 import { Field, ErrorMessage } from "formik";
 
-export const CategoryForm = ({ formik }) => {
+export const CategoryForm = ({ buttonTitle }) => {
   return (
     <>
       <div className="form-container__content">
@@ -20,7 +20,7 @@ export const CategoryForm = ({ formik }) => {
           <ErrorMessage name="unit" component="p" className="input-error" />
         </div>
       </div>
-      <Button type="submit"></Button>
+      <Button type="submit" title={buttonTitle}></Button>
     </>
   );
 };

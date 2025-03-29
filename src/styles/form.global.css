@@ -1,34 +1,9 @@
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+.main-container {
   display: flex;
-  align-items: center;
   flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.pop-up {
-  position: absolute;
-  background-color: gray;
-  padding: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  min-height: auto;
-  max-height: 70%;
-  overflow: auto;
-  border-radius: 10px;
-}
-
-.close {
-  position: absolute;
-  left: 90%;
-  cursor: pointer;
-  font-size: 20px;
-  margin-bottom: 30px;
+  align-items: center;
+  justify-self: center;
+  margin-top: 40px;
 }
 
 .form-container {
@@ -38,6 +13,11 @@
 h1 {
   color: #000;
   text-align: center;
+}
+
+.loading_screen {
+  display: flex;
+  flex-direction: column;
 }
 
 .form {
@@ -58,6 +38,10 @@ h1 {
   align-items: flex-start;
   justify-content: center;
   gap: 10px;
+}
+
+.form-container__content > label {
+  color: #fff;
 }
 
 .form-container__content__input-group {
@@ -86,7 +70,6 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .form__select {
   width: 200px;
-  height: 27px;
 }
 
 .form__select * {
@@ -113,7 +96,8 @@ input[type="number"]::-webkit-outer-spin-button {
   .pop-up {
     width: 70%;
     max-width: 298px;
-    transform: translate(-50%, -30%);
+    transform: none;
+    top: 40px;
   }
 
   .form-container__content {

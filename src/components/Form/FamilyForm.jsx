@@ -1,10 +1,69 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import cityDistricts from "../../constants/cityDistricts";
+import { Field, ErrorMessage, useFormikContext } from "formik";
 import Label from "../UI/Label/Label";
 import Button from "../UI/Button/Button";
-import cities from "../../constants/cityItem";
-import { Field, ErrorMessage } from "formik";
+import Select from "react-select";
 
-const FamilyForm = () => {
+const FamilyForm = ({ process, buttonTitle }) => {
+  const { values } = useFormikContext();
+  const [filteredCity, setFilteredCity] = useState([]);
+  const [filteredDistrict, setFilteredDistrict] = useState([]);
+
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+
+  // Şehiri alma
+  const cityOptions = cityDistricts.map((city) => ({
+    label: city.city,
+    value: city.city,
+  }));
+
+  useEffect(() => {
+    setFilteredCity(cityOptions);
+
+    if (process == "update") {
+      const updateSelectCity = {
+        value: values.address.city,
+        label: values.address.city,
+      };
+
+      const updateSelectDistrict = {
+        value: values.address.district,
+        label: values.address.district,
+      };
+
+      setSelectedCity(updateSelectCity);
+      setSelectedDistrict(updateSelectDistrict);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedCity) {
+      const cityData = cityDistricts.find(
+        (city) => city.city === selectedCity.value
+      );
+      const districtOptions = cityData
+        ? cityData.districts.map((district) => ({
+            label: district,
+            value: district,
+          }))
+        : [];
+      setFilteredDistrict(districtOptions);
+    }
+  }, [selectedCity]);
+
+  const handleCity = (selectedOption) => {
+    setSelectedDistrict(null);
+    setSelectedCity(selectedOption);
+    values.address.city = selectedOption.value;
+  };
+
+  const handleDistrict = (selectedOption) => {
+    setSelectedDistrict(selectedOption);
+    values.address.district = selectedOption.value;
+  };
+
   return (
     <>
       {/* Aile Adı */}
@@ -59,17 +118,22 @@ const FamilyForm = () => {
         </div>
       </div>
 
-      {/* İl */}
       <div className="form-container__content">
         <Label text="İl:" />
         <div className="form-container__content__input-group">
-          <Field as="select" name="address.city" className="form__select">
-            {cities.map((value, index) => (
-              <option key={index} value={value}>
-                {value}
-              </option>
-            ))}
-          </Field>
+          <Select
+            className="form__select"
+            value={selectedCity}
+            onChange={handleCity}
+            options={filteredCity}
+            isSearchable={true}
+            filterOption={(option, input) =>
+              option.label
+                .toLocaleLowerCase("tr")
+                .includes(input.toLocaleLowerCase("tr"))
+            }
+            placeholder="İl seçin"
+          />
           <ErrorMessage
             name="address.city"
             component="p"
@@ -78,11 +142,22 @@ const FamilyForm = () => {
         </div>
       </div>
 
-      {/* İlçe */}
       <div className="form-container__content">
         <Label text="İlçe:" />
         <div className="form-container__content__input-group">
-          <Field type="text" name="address.district" className="form__select" />
+          <Select
+            className="form__select"
+            value={selectedDistrict}
+            onChange={handleDistrict}
+            options={filteredDistrict}
+            isSearchable={true}
+            filterOption={(option, input) =>
+              option.label
+                .toLocaleLowerCase("tr")
+                .includes(input.toLocaleLowerCase("tr"))
+            }
+            placeholder="İlçe seçin"
+          />
           <ErrorMessage
             name="address.district"
             component="p"
@@ -121,7 +196,7 @@ const FamilyForm = () => {
         </div>
       </div>
 
-      <Button type="submit"></Button>
+      <Button type="submit" title={buttonTitle}></Button>
     </>
   );
 };

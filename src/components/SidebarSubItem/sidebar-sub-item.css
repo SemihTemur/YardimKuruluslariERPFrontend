@@ -9,16 +9,16 @@
   opacity: 1;
   visibility: visible;
   max-height: 1000px; /* Yeterince büyük bir değer belirleyin */
-  transition: opacity 0.5s ease-in-out, visibility 0.5s,
-    max-height 0.5s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s,
+    max-height 0.3s ease-in-out;
 }
 
 .navbar__sub--close {
   opacity: 0;
   visibility: hidden;
   max-height: 0;
-  transition: opacity 0.5s ease-in-out, visibility 0.5s,
-    max-height 0.5s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s,
+    max-height 0.3s ease-in-out;
 }
 
 .navbar__sub-item {
@@ -56,6 +56,8 @@
 
 .navbar__item__sub-container-icon-text > svg {
   font-size: 22.5px;
+  color: #ffff !important;
+  fill: #ffff !important;
 }
 
 .navbar__item__sub-container-arrow-icon {
@@ -90,8 +92,8 @@
   visibility: hidden;
   max-height: 0;
   overflow: hidden;
-  transition: opacity 0.5s ease-in-out, visibility 0.5s,
-    max-height 0.5s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s,
+    max-height 0.3s ease-in-out;
   margin-left: 20px;
 }
 
@@ -99,16 +101,16 @@
   opacity: 1;
   visibility: visible;
   max-height: 1000px; /* Yeterince büyük bir değer belirleyin */
-  transition: opacity 0.5s ease-in-out, visibility 0.5s,
-    max-height 0.5s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s,
+    max-height 0.3s ease-in-out;
 }
 
 .navbar__sub__child--close {
   opacity: 0;
   visibility: hidden;
   max-height: 0;
-  transition: opacity 0.5s ease-in-out, visibility 0.5s,
-    max-height 0.5s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s,
+    max-height 0.3s ease-in-out;
 }
 
 .navbar__sub__child-item {

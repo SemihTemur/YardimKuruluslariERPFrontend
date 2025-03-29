@@ -1,8 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import sidebarReducer from "./sidebarSlice";
+import cashReducer from "./cashSlice";
 
 export const store = configureStore({
   reducer: {
-    sidebar: sidebarReducer,
+    cash: cashReducer,
   },
 });
+
+export default store;

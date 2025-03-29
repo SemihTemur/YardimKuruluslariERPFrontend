@@ -3,16 +3,26 @@
   padding: 0;
   box-sizing: border-box;
   list-style: none;
-  color: white;
 }
 
 .container {
   display: flex;
+  position: relative;
 }
 
 .box {
   display: flex;
   flex-direction: column;
   width: 100%;
-  overflow: auto;
+  z-index: 1;
+  overflow: hidden;
+  background-color: #314155;
+  min-height: 100vh;
+}
+
+@media screen and (max-width:768px) {
+  .box{
+    position: absolute;
+    left: 0;
+  }
 }

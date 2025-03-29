@@ -1,0 +1,35 @@
+/* Ana Dialog */
+.update-dialog {
+  border-radius: 12px;
+}
+
+/* Başlık */
+.dialog-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #f8f9fa;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  background-color: #1f283c;
+}
+
+span {
+  color: #fff;
+}
+
+/* Kapatma Butonu */
+.close-btn {
+  font-size: 22px;
+  color: #fff !important;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* İçerik */
+.dialog-content {
+  padding: 20px;
+  background-color: #1f283c;
+}

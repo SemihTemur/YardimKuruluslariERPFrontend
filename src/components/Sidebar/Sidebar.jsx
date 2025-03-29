@@ -3,24 +3,21 @@ import "./sidebar.css";
 import yardimLogo from "../../assets/images/yardimLogo.png";
 import menuItems from "../../constants/menuItem";
 import SidebarItem from "../SidebarItem/SidebarItem";
-import { useDispatch, useSelector } from "react-redux";
-import { activeSidebar } from "../../redux/sidebarSlice";
+import { MdArrowForwardIos } from "react-icons/md";
 
-const Sidebar = () => {
+const Sidebar = ({ collapsed, setCollapsed }) => {
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const { collapsed } = useSelector((store) => store.sidebar);
-  const dispatch = useDispatch();
-
-  const hoverSidebar = () => {
-    dispatch(activeSidebar());
+  const closeSidebar = () => {
+    setCollapsed(true);
   };
 
   return (
-    <div
-      className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}
-      onMouseEnter={hoverSidebar}
-    >
+    <div className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
+      <MdArrowForwardIos
+        className={`closeMenu ${collapsed ? "closeMenu--collapsed" : ""}`}
+        onClick={closeSidebar}
+      />
       <div
         className={`sidebar__logo ${
           collapsed ? "sidebar__logo--collapsed" : ""
@@ -39,6 +36,7 @@ const Sidebar = () => {
               setActiveIndex={setActiveIndex}
               activeIndex={activeIndex}
               index={index}
+              collapsed={collapsed}
             />
           ))}
         </ul>

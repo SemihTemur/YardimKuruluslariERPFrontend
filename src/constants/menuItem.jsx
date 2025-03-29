@@ -16,10 +16,7 @@ const menuItems = [
   {
     menu: "Bağışçı",
     icon: <PeopleIcon />,
-    subItems: [
-      { menu: "Bağışçı Ekle", url: "/bagisci/ekle" },
-      { menu: "Bağışçı Listele", url: "/bagisci/list" },
-    ],
+    url: "/donor",
   },
   {
     menu: "Bağış",
@@ -28,18 +25,12 @@ const menuItems = [
       {
         menu: "Nakdi Bağış",
         icon: <AttachMoneyIcon />,
-        subItems: [
-          { menu: "Nakdi Bağış Ekle", url: "/bagis/nakdi/ekle" },
-          { menu: "Nakdi Bağış Listele", url: "/bagis/nakdi/list" },
-        ],
+        url: "/donation/cash",
       },
       {
         menu: "Ayni Bağış",
         icon: <CardGiftcardIcon />,
-        subItems: [
-          { menu: "Ayni Bağış Ekle", url: "/bagis/ayni/ekle" },
-          { menu: "Ayni Bağış Listele", url: "/bagis/ayni/list" },
-        ],
+        url: "/donation/inkind",
       },
     ],
   },
@@ -47,18 +38,12 @@ const menuItems = [
   {
     menu: "Aile",
     icon: <FamilyRestroomIcon />,
-    subItems: [
-      { menu: "Aile Ekle", url: "/aile/ekle" },
-      { menu: "Aile Listele", url: "/aile/list" },
-    ],
+    url: "/family",
   },
   {
     menu: "Öğrenci",
     icon: <SchoolIcon />,
-    subItems: [
-      { menu: "Öğrenci Ekle", url: "/ogrenci/ekle" },
-      { menu: "Öğrenci Listele", url: "/ogrenci/list" },
-    ],
+    url: "/student",
   },
   {
     menu: "Yardım",
@@ -67,28 +52,19 @@ const menuItems = [
       {
         menu: "Nakdi Yardım",
         icon: <AttachMoneyIcon />,
-        subItems: [
-          { menu: "Nakdi Yardım Ekle", url: "/yardim/nakdi/ekle" },
-          { menu: "Nakdi Yardım Listele", url: "/yardim/nakdi/list" },
-        ],
+        url: "/aid/cash",
       },
       {
         menu: "Ayni Yardım",
         icon: <CardGiftcardIcon />,
-        subItems: [
-          { menu: "Ayni Yardım Ekle", url: "/yardim/ayni/ekle" },
-          { menu: "Ayni Yardım Listele", url: "/yardim/ayni/list" },
-        ],
+        url: "/aid/inkind",
       },
     ],
   },
   {
     menu: "Burs",
     icon: <SavingsIcon />,
-    subItems: [
-      { menu: "Burs Ekle", url: "/burs/ekle" },
-      { menu: "Burs Listele", url: "/burs/list" },
-    ],
+    url: "/scholarship",
   },
   {
     menu: "Gelirler",
@@ -99,20 +75,17 @@ const menuItems = [
         subItems: [
           {
             menu: "Nakdi Bağış Gelirleri",
-            url: "/gelirler/bagis-gelirleri/nakdi-bagis-gelirleri",
+            url: "/income/donation-income/cash-donations",
           },
           {
             menu: "Ayni Bağış Gelirleri",
-            url: "/gelirler/bagis-gelirleri/ayni-bagis-gelirleri",
+            url: "/income/donation-income/in-kind-donations",
           },
         ],
       },
       {
         menu: "Diğer Gelirleri",
-        subItems: [
-          { menu: "Diğer Gelir Ekle", url: "/gelirler/diger/ekle" },
-          { menu: "Diğer Gelir Listele", url: "/gelirler/diger/list" },
-        ],
+        url: "/income/other",
       },
     ],
   },
@@ -136,30 +109,23 @@ const menuItems = [
       },
       {
         menu: "Diğer Giderler",
-        subItems: [
-          { menu: "Diğer Gider Ekle", url: "/giderler/diger/ekle" },
-          { menu: "Diğer Gider Listele", url: "/giderler/diger/list" },
-        ],
+        url: "/expense/other",
       },
     ],
   },
   {
     menu: "Tür",
     icon: <CategoryIcon />,
-    subItems: [
-      { menu: "Tür Ekle", url: "/tur/ekle" },
-      { menu: "Tür Listele", url: "/tur/list" },
-    ],
+    url: "/category",
   },
   {
     menu: "Envanter",
     icon: <InventoryIcon />,
-    subItems: [{ menu: "Envanteri Listele", url: "/envanter/list" }],
+    url: "/inventory",
   },
   {
     menu: "Log",
     icon: <FaHistory />,
-    subItems: [{ menu: "Loglari Listele", url: "/log/list" }],
   },
 ];
 
