@@ -8,6 +8,7 @@ export const CategoryForm = ({ buttonTitle }) => {
     <>
       <div className="form-container__content">
         <Label text="Tür Adı:" />
+
         <div className="form-container__content__input-group">
           <Field type="text" name="itemName" className="form__input" />
           <ErrorMessage name="itemName" component="p" className="input-error" />

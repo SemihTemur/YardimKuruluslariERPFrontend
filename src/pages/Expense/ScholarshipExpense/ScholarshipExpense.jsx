@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Skeleton, Box } from "@mui/material";
@@ -6,14 +6,14 @@ import Tooltip from "@mui/material/Tooltip";
 import SearchIcon from "@mui/icons-material/Search";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { FaFilePdf } from "react-icons/fa";
-import useApi from "../../../hooks/useApi .js";
-import "../../../styles/table-global.css";
-import { useSpecificState } from "../../../hooks/useSpecificState.js";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import useApi from "../../../hooks/useApi .js";
+import { useSpecificState } from "../../../hooks/useSpecificState.js";
+import "../../../styles/table-global.css";
 
-const InKindDonationIncome = () => {
+const ScholarshipExpense = () => {
   const { makeRequest } = useApi();
 
   const {
@@ -26,85 +26,87 @@ const InKindDonationIncome = () => {
     searchText,
     tableTitle,
     handleSearch,
-  } = useSpecificState("Ayni Gelirler Listesi");
+  } = useSpecificState("Burs Giderler Listesi");
 
   const paginationModel = { page: 0, pageSize: 5 };
 
   const columns = [
     {
-      field: "donorFirstName",
-      headerName: "Bağışçı Adı",
+      field: "studentName",
+      headerName: "Öğrenci Adı",
       width: 150,
       disableColumnMenu: true,
     },
     {
-      field: "donorLastName",
-      headerName: "Bağışçı Soyadı",
+      field: "studentSurname",
+      headerName: "Öğrenci Soyadı",
       width: 150,
       disableColumnMenu: true,
-    },
-    {
-      field: "itemName",
-      headerName: "Ürün",
-      width: 150,
-      disableColumnMenu: true,
-      renderCell: (params) => {
-        return <div>{params.row?.category?.itemName || "Ürün Yok"}</div>;
-      },
     },
 
     {
-      field: "unit",
-      headerName: "Birim",
-      width: 150,
-      disableColumnMenu: true,
-      renderCell: (params) => {
-        return <div>{params.row?.category?.unit || "Adet Yok"}</div>;
-      },
-    },
-
-    {
-      field: "quantity",
-      headerName: "Miktar",
-      width: 150,
+      field: "scholarshipExpense",
+      headerName: "Burs Miktarı",
+      width: 350,
       disableColumnMenu: true,
     },
   ];
 
-  const getInKindDonationIncomeList = async () => {
+  const getScholarshipExpenseList = async () => {
     try {
-      const response = await makeRequest("get", "getInKindDonationList");
+      const response = await makeRequest("get", "getScholarshipExpenseList");
       setLoading(true);
       setData(response.data);
     } catch (error) {
       toast.error(
-        "Envanter verileri alınırken hata oluştu:",
+        "Burs giderleri alınırken hata oluştu:",
         error.response.data.data
       );
     }
   };
 
   useEffect(() => {
-    getInKindDonationIncomeList();
+    getScholarshipExpenseList();
   }, []);
 
   useEffect(() => {
+    let totalDonated = 0;
+
     if (data) {
-      const result = Object.values(
+      console.log(data);
+      let result = Object.values(
         data.reduce((acc, curr) => {
-          let key = `${curr.donorFirstName} ${curr.donorLastName} ${curr.category.itemName}`;
-
+          const key = `${curr.studentName} ${curr.studentSurname}`;
+          totalDonated += curr.scholarshipExpense;
           if (!acc[key]) {
-            acc[key] = { ...curr }; // Eğer daha önce eklenmemişse direkt ekle
+            acc[key] = { ...curr };
           } else {
-            acc[key].quantity += curr.quantity; // Eğer zaten varsa amount'u topla
+            acc[key].scholarshipExpense += curr.scholarshipExpense;
           }
-
           return acc;
         }, {})
       );
-      setFilteredRows(result); // Burada toplam bağışları güncelleriz
-      console.log(result); // Konsola yazdır
+
+      let totalDonation = {
+        scholarshipExpense: `Toplam verilen burs miktarı: ${totalDonated}`,
+        baseResponse: {
+          id: "TOTAL_DONATION_ROW",
+          createdDate: new Date().toISOString().split("T")[0],
+          modifiedDate: new Date().toISOString().split("T")[0],
+        },
+        studentName: "",
+        studentSurname: "",
+        currency: "TRY",
+      };
+
+      // Eğer son eleman zaten TOTAL_DONATION_ROW ise, ekleme
+      if (
+        result[result.length - 1]?.baseResponse?.id !== "TOTAL_DONATION_ROW"
+      ) {
+        result.push(totalDonation);
+      }
+
+      setFilteredRows(result);
     }
   }, [data]);
 
@@ -121,10 +123,6 @@ const InKindDonationIncome = () => {
     const dataForExcel = filteredRowsWithoutOperations.map((row) => {
       return columnsWithoutOperations.map((col) => {
         switch (col.field) {
-          case "itemName":
-            return row.category?.itemName || "";
-          case "unit":
-            return row.category?.unit || "";
           default:
             return row[col.field] || "";
         }
@@ -139,7 +137,7 @@ const InKindDonationIncome = () => {
     const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
-    XLSX.writeFile(workbook, "Ayni Gelirler Listesi.xlsx");
+    XLSX.writeFile(workbook, "Burs Giderleri Listesi.xlsx");
   };
 
   const exportToPDF = async () => {
@@ -159,7 +157,7 @@ const InKindDonationIncome = () => {
 
       // Başlık (daha büyük ve ortalanmış)
       doc.setFontSize(14);
-      doc.text("Ayni Gelirler Listesi", doc.internal.pageSize.width / 2, 25, {
+      doc.text("Burs Giderleri Listesi", doc.internal.pageSize.width / 2, 25, {
         align: "center",
       });
 
@@ -169,10 +167,6 @@ const InKindDonationIncome = () => {
           .filter((col) => col.field !== "actions")
           .map((col) => {
             switch (col.field) {
-              case "itemName":
-                return row.category?.itemName || "";
-              case "unit":
-                return row.category?.unit || "";
               default:
                 return row[col.field] || "";
             }
@@ -200,16 +194,10 @@ const InKindDonationIncome = () => {
         .filter((col) => col.field !== "actions")
         .map((col) => normalizeHeader(col.headerName));
 
-      // Özel sütun genişlikleri (fotoğraftaki gibi düzen)
       const columnStyles = {
-        0: { cellWidth: 165 },
-        1: { cellWidth: 165 },
-        2: { cellWidth: 165 },
-        3: { cellWidth: 165 },
-        4: { cellWidth: 165 },
-        5: { cellWidth: 165 },
-        6: { cellWidth: 165 },
-        7: { cellWidth: 165 },
+        0: { cellWidth: 270 },
+        1: { cellWidth: 270 },
+        2: { cellWidth: 270 },
       };
 
       // Tablo oluşturma
@@ -255,7 +243,7 @@ const InKindDonationIncome = () => {
         },
       });
 
-      doc.save("Ayni Gelirler_Listesi.pdf");
+      doc.save("Burs Giderleri_Listesi.pdf");
     } catch (error) {
       console.error("PDF oluşturulurken hata:", error);
       alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
@@ -339,4 +327,4 @@ const InKindDonationIncome = () => {
   );
 };
 
-export default InKindDonationIncome;
+export default ScholarshipExpense;

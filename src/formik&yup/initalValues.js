@@ -106,3 +106,10 @@ export const scholarshipInitialValues = {
   period: "",
   duration: "",
 };
+
+export const userInitialValues = {
+  username: "",
+  email: "",
+  password: "",
+  role: "",
+};

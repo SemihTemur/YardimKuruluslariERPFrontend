@@ -93,17 +93,17 @@ const menuItems = [
     menu: "Giderler",
     icon: <TrendingDownIcon />,
     subItems: [
-      { menu: "Burs Giderleri", url: "/giderler/burs-giderler" },
+      { menu: "Burs Giderleri", url: "/expense/scholarship-expense" },
       {
         menu: "Yardım Giderleri",
         subItems: [
           {
             menu: "Nakdi Yardim Giderleri",
-            url: "/giderler/yardim-giderler/nakdi-yardim-giderler",
+            url: "/expense/aid-expense/cash-aid-expense",
           },
           {
             menu: "Ayni Yardım Giderleri",
-            url: "/giderler/yardim-giderler/ayni-yardim-giderler",
+            url: "/expense/aid-expense/in-kind-aid-expense",
           },
         ],
       },

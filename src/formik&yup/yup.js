@@ -258,7 +258,7 @@ export const inKindAidYup = Yup.object({
 export const otherIncomeYup = Yup.object({
   description: Yup.string()
     .matches(
-      /^[a-zA-ZğüşöçİĞÜŞÖÇ\s]+$/,
+      /^[a-zA-ZÇĞİÖŞÜçğıöşü\s]+$/,
       "Açıklama yalnızca harflerden oluşmalıdır."
     )
     .required("Açıklama yazmak zorunludur."),
@@ -319,8 +319,26 @@ export const scholarshipYup = Yup.object({
   currency: Yup.string(),
   period: Yup.string().required("Dönem seçmek zorunludur"),
   duration: Yup.number()
-    .required(" Burs süresi zorunludur")
-    .typeError("Burs süresi sayısal bir değer olmalıdır")
-    .positive("Burs süresi pozitif olmalıdır")
-    .integer("Burs süresi tam sayı olmalıdır"),
+    .required(" Yardım süresi zorunludur")
+    .typeError("Yardım süresi sayısal bir değer olmalıdır")
+    .positive("Yardım süresi pozitif olmalıdır")
+    .integer("Yardım süresi tam sayı olmalıdır"),
+});
+
+export const userYup = Yup.object().shape({
+  username: Yup.string()
+    .required("Kullanıcı adı zorunludur")
+    .min(3, "Kullanıcı adı en az 3 karakter olmalıdır")
+    .max(20, "Kullanıcı adı en fazla 20 karakter olabilir"),
+
+  email: Yup.string()
+    .required("Email zorunludur")
+    .email("Geçerli bir email adresi giriniz"),
+
+  password: Yup.string()
+    .required("Şifre zorunludur")
+    .min(6, "Şifre en az 6 karakter olmalıdır")
+    .max(20, "Şifre en fazla 20 karakter olabilir"),
+
+  role: Yup.string().required("Rol seçimi zorunludur"),
 });

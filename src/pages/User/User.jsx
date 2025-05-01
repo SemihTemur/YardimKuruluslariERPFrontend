@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { getCashBalance } from "../../../redux/cashSlice";
-import { useGlobalState } from "../../../hooks/useGlobalState.js";
-import useApi from "../../../hooks/useApi .js";
+import { useGlobalState } from "../../hooks/useGlobalState.js";
+import useApi from "../../hooks/useApi .js";
 import Button from "@mui/material/Button";
 import { Skeleton, Box } from "@mui/material";
 import { toast, Toaster } from "react-hot-toast";
-import { otherIncomeInitialValues } from "../../../formik&yup/initalValues.js";
-import { otherIncomeYup } from "../../../formik&yup/yup.js";
-import FormDialog from "../../../components/Dialog/FormScreenDialog/FormDialog.jsx";
-import DeleteScreenDialog from "../../../components/Dialog/DeleteScreenDialog/DeleteScreenDialog.jsx";
-import Table from "../../../components/UI/Table/Table.jsx";
-import OtherIncomeForm from "../../../components/Form/OtherIncomeForm.jsx";
+import { userInitialValues } from "../../formik&yup/initalValues.js";
+import { userYup } from "../../formik&yup/yup.js";
+import "../../styles/table-global.css";
+import FormDialog from "../../components/Dialog/FormScreenDialog/FormDialog.jsx";
+import DeleteScreenDialog from "../../components/Dialog/DeleteScreenDialog/DeleteScreenDialog.jsx";
+import Table from "../../components/UI/Table/Table.jsx";
+import UserForm from "../../components/Form/UserForm.jsx";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-const OtherIncome = () => {
+const User = () => {
   const { makeRequest } = useApi();
-  const dispatch = useDispatch();
 
-  const tableTitle = "Diğer Gelirler Listesi";
+  const tableTitle = "Kullanıcı Listesi";
 
   const [buttonTitle, setButtonTitle] = useState("");
 
@@ -51,22 +49,33 @@ const OtherIncome = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Gelir", otherIncomeInitialValues, setButtonTitle);
+  } = useGlobalState("Kullanıcı", categoryInitialValues, setButtonTitle);
 
   const columns = [
     {
-      field: "description",
-      headerName: "Açıklama",
+      field: "username",
+      headerName: "Kullanıcı Adı",
       width: 150,
       disableColumnMenu: true,
     },
     {
-      field: "amount",
-      headerName: "Gelir Miktarı",
+      field: "email",
+      headerName: "Email",
       width: 150,
       disableColumnMenu: true,
     },
-
+    {
+      field: "password",
+      headerName: "Şifre",
+      width: 150,
+      disableColumnMenu: true,
+    },
+    {
+      field: "role",
+      headerName: "Rol",
+      width: 150,
+      disableColumnMenu: true,
+    },
     {
       field: "createdDate",
       headerName: "Kayıt Tarihi",
@@ -93,7 +102,6 @@ const OtherIncome = () => {
         );
       },
     },
-
     selectedRows.length < 2
       ? {
           headerName: "İşlemler",
@@ -124,30 +132,30 @@ const OtherIncome = () => {
       : {},
   ];
 
-  // list
   useEffect(() => {
-    getOtherIncomeList();
+    getUserList();
   }, []);
 
-  const getOtherIncomeList = async () => {
+  // list
+  const getUserList = async () => {
     try {
-      const response = await makeRequest("get", "getOtherIncomeList");
+      const response = await makeRequest("get", "getCategoryList");
       setLoading(true);
       setData(response.data);
     } catch (error) {
       toast.error(
-        "Diğer gelirler verileri alınırken hata oluştu:",
+        "Tür verileri alınırken hata oluştu:",
         error.response.data.data
       );
     }
   };
 
   // Save
-  const saveOtherIncome = async (values, { resetForm }) => {
+  const saveCategory = async (values, { resetForm }) => {
     try {
-      const response = await makeRequest("post", "saveOtherIncome", values);
+      const response = await makeRequest("post", "saveCategory", values);
       updatedDatas(response.data, "save");
-      toast.success("Diğer gelir başarıyla kaydedildi!");
+      toast.success("Tür başarıyla kaydedildi!");
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(error.response.data.data || "Bir hata oluştu.");
@@ -156,22 +164,22 @@ const OtherIncome = () => {
       }
     }
 
-    dispatch(getCashBalance());
     resetForm();
     onCloseScreenDelay();
   };
 
   // Update
-  const updateOtherIncomeById = async (values) => {
+  const updateCategoryById = async (values) => {
     try {
       const response = await makeRequest(
         "put",
-        "updateOtherIncomeById",
+        "updateCategoryById",
         values,
         selectedId
       );
+
       updatedDatas(response.data, "update");
-      toast.success("Diğer gelir başarıyla güncellendi!");
+      toast.success("Tür başarıyla güncellendi!");
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(error.response.data.data || "Bir hata oluştu.");
@@ -179,22 +187,21 @@ const OtherIncome = () => {
         toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
       }
     }
-    dispatch(getCashBalance());
     onCloseScreenDelay();
     setIsUpdatedOpen(false);
   };
 
   // Deletes
-  const deleteOtherIncomeById = async () => {
+  const deleteCategoryById = async () => {
     try {
       const response = await makeRequest(
         "delete",
-        "deleteOtherIncomeById",
+        "deleteCategoryById",
         null,
         selectedId
       );
       updatedDatas(response.data, "delete");
-      toast.success("Diğer gelir başarıyla silindi!");
+      toast.success("Tür başarıyla silindi!");
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(error.response.data.data || "Bir hata oluştu.");
@@ -202,30 +209,25 @@ const OtherIncome = () => {
         toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
       }
     }
-
-    dispatch(getCashBalance());
     setIsDeletedOpen(false);
   };
 
-  const deleteOtherIncomes = async () => {
+  const deleteSelectedCategories = async () => {
     try {
       for (const row of selectedRows) {
         const response = await makeRequest(
           "delete",
-          "deleteOtherIncomeById",
+          "deleteCategoryById",
           null,
           row
         );
         updatedDatas(response.data, "delete");
       }
-      toast.success("Diğer gelirler başarıyla silindi!");
+      toast.success("Türler başarıyla silindi!");
     } catch (error) {
-      toast.error(
-        "Diğer gelirler silinemedi! Lütfen tekrar deneyin." +
-          error.response.data.data
-      );
+      toast.error("Türler silinemedi! Lütfen tekrar deneyin.");
     }
-    dispatch(getCashBalance());
+
     setSelectedRows([]); // Seçimi sıfırla
     setIsDeletedOpen(false);
   };
@@ -261,7 +263,7 @@ const OtherIncome = () => {
     const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
-    XLSX.writeFile(workbook, "Diğer Gelirler Listesi.xlsx");
+    XLSX.writeFile(workbook, "Kategoriler Listesi.xlsx");
   };
 
   const exportToPDF = async () => {
@@ -281,7 +283,7 @@ const OtherIncome = () => {
 
       // Başlık (daha büyük ve ortalanmış)
       doc.setFontSize(14);
-      doc.text("Diğer Gelirler Listesi", doc.internal.pageSize.width / 2, 25, {
+      doc.text("Kategoriler Listesi", doc.internal.pageSize.width / 2, 25, {
         align: "center",
       });
 
@@ -327,10 +329,10 @@ const OtherIncome = () => {
         .map((col) => normalizeHeader(col.headerName));
 
       const columnStyles = {
-        0: { cellWidth: 200 },
-        1: { cellWidth: 200 },
-        2: { cellWidth: 200 },
-        3: { cellWidth: 200 },
+        0: { cellWidth: 200 }, // ürün Adı
+        1: { cellWidth: 200 }, // Birim Adı
+        2: { cellWidth: 200 }, // Kayıt Tarihi
+        3: { cellWidth: 200 }, // Güncelleme Tarihi
       };
 
       // Tablo oluşturma
@@ -376,7 +378,7 @@ const OtherIncome = () => {
         },
       });
 
-      doc.save("Diğer Gelirler_Listesi.pdf");
+      doc.save("Kategoriler_Listesi.pdf");
     } catch (error) {
       console.error("PDF oluşturulurken hata:", error);
       alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
@@ -426,14 +428,14 @@ const OtherIncome = () => {
 
           {(isUpdatedOpen || isAddOpen) && (
             <FormDialog
-              Component={OtherIncomeForm}
+              Component={CategoryForm}
               title={screenTitle}
               buttonTitle={buttonTitle}
               isOpen={isUpdatedOpen || isAddOpen}
               onClose={onCloseScreen}
-              onSubmit={isAddOpen ? saveOtherIncome : updateOtherIncomeById}
+              onSubmit={isAddOpen ? saveCategory : updateCategoryById}
               initialValues={selectedData}
-              validationSchema={otherIncomeYup}
+              validationSchema={categoryYup}
               process={process}
             />
           )}
@@ -444,16 +446,15 @@ const OtherIncome = () => {
               closeDeleteDialog={closeDeleteDialog}
               deleteCashDonationById={
                 selectedRows.length > 1
-                  ? deleteOtherIncomes
-                  : deleteOtherIncomeById
+                  ? deleteSelectedCategories
+                  : deleteCategoryById
               }
             />
           )}
-          <Toaster position="top-center" reverseOrder={false} />
         </>
       )}
     </div>
   );
 };
 
-export default OtherIncome;
+export default User;

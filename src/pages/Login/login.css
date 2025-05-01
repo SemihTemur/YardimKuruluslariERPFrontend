@@ -1,0 +1,103 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background-color: #1e2a38;
+  display: flex;
+  justify-content: center;
+}
+
+.title {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 40px;
+  margin-top: 50px;
+}
+
+.admin-login-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 80px;
+}
+
+.admin-login-card {
+  background-color: #2f3e4e;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+.admin-login-title {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.admin-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border: 1px solid #3e5063;
+  background-color: #3b4b5c;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.admin-input-icon {
+  color: #a9b7c6;
+  margin-right: 10px;
+}
+
+.admin-input-group input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  width: 100%;
+  font-size: 14px;
+}
+
+.admin-forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.admin-forgot-password a {
+  color: #90caf9;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.admin-forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.admin-login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-login-button:hover {
+  background-color: #1565c0;
+}
+
+.visible {
+  cursor: pointer;
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export const useGlobalState = (title, initialValues, setButtonTitle) => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [selectedData, setSelectedData] = useState([]);
@@ -24,6 +24,27 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
   useEffect(() => {
     setFilteredRows(data);
   }, [data]);
+
+  const updatedDatas = (processData, process) => {
+    if (process == "save") {
+      setData((prev) => [...(Array.isArray(prev) ? prev : []), processData]);
+    } else if (process == "update") {
+      setData((prev) =>
+        prev.map((item) => {
+          if (item.baseResponse.id === processData.baseResponse.id) {
+            return processData;
+          }
+          return item;
+        })
+      );
+    } else {
+      setData((prev) =>
+        prev.filter(
+          (item) => item.baseResponse.id !== processData.baseResponse.id
+        )
+      );
+    }
+  };
 
   const onCloseScreenDelay = () => {
     setTimeout(() => {
@@ -50,7 +71,6 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
     setSelectedData(item);
     setIsAddOpen(false);
     setIsUpdatedOpen(true);
-    console.log("se");
     console.log(selectedData);
   };
 
@@ -88,6 +108,7 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
     setData,
     loading,
     setLoading,
+    updatedDatas,
     selectedData,
     isAddOpen,
     isUpdatedOpen,

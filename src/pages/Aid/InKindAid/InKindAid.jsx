@@ -10,11 +10,14 @@ import FormDialog from "../../../components/Dialog/FormScreenDialog/FormDialog.j
 import DeleteScreenDialog from "../../../components/Dialog/DeleteScreenDialog/DeleteScreenDialog.jsx";
 import Table from "../../../components/UI/Table/Table.jsx";
 import InKindAidForm from "../../../components/Form/InKindAidForm.jsx";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const InKindAid = () => {
   const { makeRequest } = useApi();
 
-  const tableTitle = "Ayni Yardım Listesi";
+  const tableTitle = "Ayni Yardım Yapanlar Listesi";
 
   const [buttonTitle, setButtonTitle] = useState("");
 
@@ -23,6 +26,7 @@ const InKindAid = () => {
     setData,
     loading,
     setLoading,
+    updatedDatas,
     selectedData,
     isAddOpen,
     isUpdatedOpen,
@@ -114,12 +118,26 @@ const InKindAid = () => {
       headerName: "Kayıt Tarihi",
       width: 150,
       disableColumnMenu: true,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params.row?.baseResponse?.createdDate || "Oluşturulma Tarihi Yok."}
+          </div>
+        );
+      },
     },
     {
       field: "modifiedDate",
       headerName: "Güncellenme Tarihi",
       width: 150,
       disableColumnMenu: true,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params.row?.baseResponse?.modifiedDate || "Güncelleme Tarihi Yok."}
+          </div>
+        );
+      },
     },
 
     selectedRows.length < 2
@@ -133,13 +151,15 @@ const InKindAid = () => {
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => openDeleteDialog(params.row.id)}
+                onClick={() => openDeleteDialog(params.row.baseResponse.id)}
               >
                 Sil
               </Button>
               <Button
                 variant="contained"
-                onClick={() => openUpdateScreen(params.row, params.row.id)}
+                onClick={() =>
+                  openUpdateScreen(params.row, params.row.baseResponse.id)
+                }
               >
                 Güncelle
               </Button>
@@ -150,70 +170,79 @@ const InKindAid = () => {
       : {},
   ];
 
-  const updatedData = () => {
-    return data.filter((item) => item.id !== selectedId);
-  };
-
-  // list
-  const getInKindAidList = async () => {
-    try {
-      const inKindAidData = await makeRequest("get", "getInKindAidList");
-      if (inKindAidData) {
-        setData(inKindAidData);
-        setLoading(true);
-      }
-    } catch (error) {
-      console.error("Bağış verileri alınırken hata oluştu:", error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     getInKindAidList();
   }, []);
 
+  // list
+  const getInKindAidList = async () => {
+    try {
+      const response = await makeRequest("get", "getInKindAidList");
+      setLoading(true);
+      setData(response.data);
+    } catch (error) {
+      console.error("Ayni yardım verileri alınırken hata oluştu:", error);
+    }
+  };
+
   // Save
   const saveİnKindAid = async (values, { resetForm }) => {
     try {
-      await makeRequest("post", "saveInKindAid", values);
-
-      await getInKindAidList();
-
-      toast.success("Bağış başarıyla kaydedildi!");
-      resetForm();
-      onCloseScreenDelay();
-      console.log(values);
+      const response = await makeRequest("post", "saveInKindAid", values);
+      updatedDatas(response.data, "save");
+      toast.success("Ayni yardım başarıyla kaydedildi!");
     } catch (error) {
-      toast.error(
-        "Bağış kaydedilemedi! Lütfen tekrar deneyin veya destek ekibiyle iletişime geçin."
-      );
-      console.log(error);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.data || "Bir hata oluştu.");
+      } else {
+        toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
+      }
     }
+
+    resetForm();
+    onCloseScreenDelay();
   };
 
   // Update
   const updateInKindAidById = async (values) => {
     try {
-      await makeRequest("put", "updateInKindAidById", values, selectedId);
-      await getInKindAidList();
-      toast.success("Bağış başarıyla güncellendi!");
-      onCloseScreenDelay();
-    } catch (error) {
-      toast.error(
-        "Bağış güncellenemedi! Lütfen tekrar deneyin veya destek ekibiyle iletişime geçin."
+      const response = await makeRequest(
+        "put",
+        "updateInKindAidById",
+        values,
+        selectedId
       );
+
+      updatedDatas(response.data, "update");
+      toast.success("Ayni yardım başarıyla güncellendi!");
+    } catch (error) {
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.data || "Bir hata oluştu.");
+      } else {
+        toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
+      }
     }
+    onCloseScreenDelay();
     setIsUpdatedOpen(false);
   };
 
   // Deletes
   const deleteInKindAidById = async () => {
     try {
-      await makeRequest("delete", "deleteInKindAidById", null, selectedId);
-      setData(updatedData(null, "delete"));
-      toast.success("Bağış başarıyla silindi!");
+      const response = await makeRequest(
+        "delete",
+        "deleteInKindAidById",
+        null,
+        selectedId
+      );
+      updatedDatas(response.data, "delete");
+      toast.success("Ayni yardım başarıyla silindi!");
     } catch (error) {
-      toast.error("Bağış silinemedi! Lütfen tekrar deneyin.");
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.data || "Bir hata oluştu.");
+      } else {
+        toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
+      }
     }
     setIsDeletedOpen(false);
   };
@@ -221,19 +250,188 @@ const InKindAid = () => {
   const deleteInKindAids = async () => {
     try {
       for (const row of selectedRows) {
-        await makeRequest("delete", "deleteInKindAidById", null, row);
+        const response = await makeRequest(
+          "delete",
+          "deleteInKindAidById",
+          null,
+          row
+        );
+        updatedDatas(response.data, "delete");
       }
-      toast.success("Silindi!");
+      toast.success("Ayni yardımlar başarıyla silindi!");
     } catch (error) {
-      toast.error("Silinemedi.");
+      toast.error("Ayni yardımlar silinemedi! Lütfen tekrar deneyin.");
     }
-    // Silme işleminden sonra veriyi güncelle
-    const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row === item.id)
-    );
-    setData(updatedData);
     setSelectedRows([]); // Seçimi sıfırla
     setIsDeletedOpen(false);
+  };
+
+  const exportToExcel = () => {
+    const filteredRowsWithoutOperations = filteredRows.map((row) => {
+      const { actions, ...rest } = row;
+      return rest;
+    });
+
+    const columnsWithoutOperations = columns.filter(
+      (col) => col.field && col.field !== "actions"
+    );
+
+    const dataForExcel = filteredRowsWithoutOperations.map((row) => {
+      return columnsWithoutOperations.map((col) => {
+        switch (col.field) {
+          case "itemName":
+            return row.category?.itemName || "";
+          case "unit":
+            return row.category?.unit || "";
+          case "createdDate":
+            return row.baseResponse?.createdDate || "";
+          case "modifiedDate":
+            return row.baseResponse?.modifiedDate || "";
+          default:
+            return row[col.field] || "";
+        }
+      });
+    });
+
+    const excelData = [
+      columnsWithoutOperations.map((col) => col.headerName),
+      ...dataForExcel,
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
+    XLSX.writeFile(workbook, "Ayni Yardım Listesi.xlsx");
+  };
+
+  const exportToPDF = async () => {
+    // Yatay modda A4 boyutu (daha fazla alan sağlar)
+    const doc = new jsPDF("l", "pt", "a4");
+
+    try {
+      // Font yükleme
+      const response = await fetch("/fonts/times-base64.txt");
+      if (!response.ok)
+        throw new Error("Font dosyası bulunamadı veya yüklenemedi.");
+      const timesFontBase64 = await response.text();
+
+      doc.addFileToVFS("TimesNewRoman.ttf", timesFontBase64);
+      doc.addFont("TimesNewRoman.ttf", "TimesNewRoman", "normal");
+      doc.setFont("TimesNewRoman");
+
+      // Başlık (daha büyük ve ortalanmış)
+      doc.setFontSize(14);
+      doc.text(
+        "Ayni Yardım Yapanlar Listesi",
+        doc.internal.pageSize.width / 2,
+        25,
+        {
+          align: "center",
+        }
+      );
+
+      // Veri hazırlama
+      const dataForPDF = filteredRows.map((row) => {
+        return columns
+          .filter((col) => col.field !== "actions")
+          .map((col) => {
+            switch (col.field) {
+              case "itemName":
+                return row.category?.itemName || "";
+              case "unit":
+                return row.category?.unit || "";
+              case "createdDate":
+                return row.baseResponse?.createdDate || "";
+              case "modifiedDate":
+                return row.baseResponse?.modifiedDate || "";
+              default:
+                return row[col.field] || "";
+            }
+          });
+      });
+
+      // Türkçe karakterleri normalize etme
+      const normalizeHeader = (text) =>
+        text
+          .replace(/ğ/g, "g")
+          .replace(/Ğ/g, "G")
+          .replace(/ü/g, "u")
+          .replace(/Ü/g, "U")
+          .replace(/ş/g, "s")
+          .replace(/Ş/g, "S")
+          .replace(/ı/g, "i")
+          .replace(/İ/g, "I")
+          .replace(/ç/g, "c")
+          .replace(/Ç/g, "C")
+          .replace(/ö/g, "o")
+          .replace(/Ö/g, "O");
+
+      // Sütun başlıkları
+      const tableColumn = columns
+        .filter((col) => col.field !== "actions")
+        .map((col) => normalizeHeader(col.headerName));
+
+      // Özel sütun genişlikleri (fotoğraftaki gibi düzen)
+      const columnStyles = {
+        0: { cellWidth: 70 },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 70 },
+        3: { cellWidth: 70 },
+        4: { cellWidth: 70 },
+        5: { cellWidth: 70 },
+        6: { cellWidth: 70 },
+        7: { cellWidth: 70 },
+        8: { cellWidth: 70 },
+      };
+
+      // Tablo oluşturma
+      autoTable(doc, {
+        head: [tableColumn],
+        body: dataForPDF,
+        startY: 40,
+        styles: {
+          font: "TimesNewRoman",
+          fontSize: 10, // Daha büyük font
+          cellPadding: 4, // Daha fazla padding
+          cellWidth: "wrap",
+          overflow: "linebreak",
+          minCellHeight: 12, // Daha büyük satır yüksekliği
+          lineColor: [0, 0, 0], // Siyah çizgiler
+          lineWidth: 0.5, // Orta kalınlıkta çizgiler
+        },
+        headStyles: {
+          fillColor: [70, 130, 120], // Koyu başlık rengi
+          textColor: 255,
+          fontStyle: "bold",
+          fontSize: 11, // Başlık fontu
+          cellPadding: 5,
+          halign: "center", // Başlık hücrelerini ortala
+        },
+        bodyStyles: {
+          halign: "center", // Tüm hücre içeriklerini ortala
+          valign: "middle",
+        },
+        columnStyles: columnStyles,
+        margin: { horizontal: 10 },
+        pageBreak: "auto",
+        tableWidth: "auto",
+        showHead: "everyPage",
+        didDrawPage: function (data) {
+          // Sayfa numarası
+          doc.setFontSize(10);
+          doc.text(
+            `Sayfa ${data.pageNumber}`,
+            doc.internal.pageSize.width - 30,
+            doc.internal.pageSize.height - 15
+          );
+        },
+      });
+
+      doc.save("Ayni Yardım Yapanlar_Listesi.pdf");
+    } catch (error) {
+      console.error("PDF oluşturulurken hata:", error);
+      alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
+    }
   };
 
   return (
@@ -268,6 +466,8 @@ const InKindAid = () => {
             filteredRows={filteredRows}
             columns={columns}
             paginationModel={paginationModel}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
             selectedRows={selectedRows}
             setSelectedRows={setSelectedRows}
             openDeleteDialog={openDeleteDialog}

@@ -18,12 +18,11 @@ export const Header = ({ setCollapsed }) => {
   const navigate = useNavigate();
 
   const clickMenu = () => {
-    console.log("semih");
     setCollapsed((prev) => !prev);
   };
 
   const goToHome = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   useEffect(() => {

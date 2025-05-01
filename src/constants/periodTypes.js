@@ -1,6 +1,6 @@
 const periodType = [
   { value: "Aylık", label: "Aylık" },
-  { value: "Haftalik", label: "Haftalik" },
+  { value: "Haftalık", label: "Haftalık" },
   { value: "Yıllık", label: "Yıllık" },
   { value: "Tek Seferlik", label: "Tek Seferlik" },
 ];

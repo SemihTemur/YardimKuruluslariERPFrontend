@@ -48,93 +48,6 @@ const Inventory = () => {
     },
   ];
 
-  const exportToExcel = () => {
-    // "İşlemler" sütununu kaldırmak için filteredRows'dan bu sütunu çıkarıyoruz
-    const filteredRowsWithoutOperations = filteredRows.map((row) => {
-      const { actions, ...rest } = row; // "actions" sütununu çıkarıyoruz
-      return rest;
-    });
-
-    // "İşlemler" sütununu columns'dan çıkarıyoruz
-    const columnsWithoutOperations = columns.filter(
-      (col) => col.field !== "actions"
-    );
-
-    // Excel'e aktarılacak veriyi oluşturuyoruz
-    const dataForExcel = filteredRowsWithoutOperations.map((row) => {
-      // Sadece columnsWithoutOperations'daki sütunları alıyoruz
-      return columnsWithoutOperations.map((col) => row[col.field] || "");
-    });
-
-    // Başlıkları ve verileri birleştiriyoruz
-    const excelData = [
-      columnsWithoutOperations.map((col) => col.headerName), // Başlıklar
-      ...dataForExcel, // Veriler
-    ];
-
-    // Excel dosyasını oluşturuyoruz
-    const worksheet = XLSX.utils.aoa_to_sheet(excelData); // Array of Arrays (aoa) kullanıyoruz
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
-
-    // Excel dosyasını indiriyoruz
-    XLSX.writeFile(workbook, `${tableTitle}.xlsx`);
-  };
-
-  const exportToPDF = async () => {
-    const doc = new jsPDF();
-
-    try {
-      // ✅ Base64 font dosyasını HTTP üzerinden oku
-      const response = await fetch("/fonts/times-base64.txt");
-      if (!response.ok) {
-        throw new Error("Font dosyası bulunamadı veya yüklenemedi.");
-      }
-      const timesFontBase64 = await response.text();
-
-      // ✅ 1. Fontu jsPDF'in sanal dosya sistemine (VFS) ekle
-      doc.addFileToVFS("TimesNewRoman.ttf", timesFontBase64);
-
-      // ✅ 2. Fontu jsPDF'e tanıt
-      doc.addFont("TimesNewRoman.ttf", "TimesNewRoman", "normal");
-
-      // ✅ 3. Fontu kullan
-      doc.setFont("TimesNewRoman");
-
-      // Başlık ekleme
-      doc.text(tableTitle, 15, 10);
-
-      // "İşlemler" sütununu kaldır
-      const filteredRowsWithoutOperations = filteredRows.map((row) => {
-        const { actions, ...rest } = row;
-        return rest;
-      });
-
-      const columnsWithoutOperations = columns.filter(
-        (col) => col.field !== "actions"
-      );
-
-      // Tablo başlık ve satırlarını oluştur
-      const tableColumn = columnsWithoutOperations.map((col) => col.headerName);
-      const tableRows = filteredRowsWithoutOperations.map((row) =>
-        columnsWithoutOperations.map((col) => row[col.field] || "")
-      );
-
-      // Tabloyu ekle
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 20,
-        styles: { font: "TimesNewRoman" }, // Font stilini belirt
-      });
-
-      // PDF'i kaydet
-      doc.save(`${tableTitle}.pdf`);
-    } catch (error) {
-      console.error("Font yüklenirken hata oluştu:", error);
-    }
-  };
-
   // Arama fonksiyonu
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
@@ -151,14 +64,14 @@ const Inventory = () => {
 
   const getInventoryList = async () => {
     try {
-      const İnventoryData = await makeRequest("get", "getInventoryList");
-      if (İnventoryData) {
-        setData(İnventoryData);
-        setLoading(true);
-      }
+      const response = await makeRequest("get", "getInventoryList");
+      setLoading(true);
+      setData(response.data);
     } catch (error) {
-      console.error("Bağış verileri alınırken hata oluştu:", error);
-      setLoading(false);
+      console.error(
+        "Envanter verileri alınırken hata oluştu:",
+        error.response.data.data
+      );
     }
   };
 
@@ -170,6 +83,146 @@ const Inventory = () => {
   useEffect(() => {
     getInventoryList();
   }, []);
+
+  const exportToExcel = () => {
+    const filteredRowsWithoutOperations = filteredRows.map((row) => {
+      const { actions, ...rest } = row;
+      return rest;
+    });
+
+    const columnsWithoutOperations = columns.filter(
+      (col) => col.field && col.field !== "actions"
+    );
+
+    const dataForExcel = filteredRowsWithoutOperations.map((row) => {
+      return columnsWithoutOperations.map((col) => {
+        switch (col.field) {
+          default:
+            return row[col.field] || "";
+        }
+      });
+    });
+
+    const excelData = [
+      columnsWithoutOperations.map((col) => col.headerName),
+      ...dataForExcel,
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
+    XLSX.writeFile(workbook, "Kategoriler Listesi.xlsx");
+  };
+
+  const exportToPDF = async () => {
+    // Yatay modda A4 boyutu (daha fazla alan sağlar)
+    const doc = new jsPDF("l", "pt", "a4");
+
+    try {
+      // Font yükleme
+      const response = await fetch("/fonts/times-base64.txt");
+      if (!response.ok)
+        throw new Error("Font dosyası bulunamadı veya yüklenemedi.");
+      const timesFontBase64 = await response.text();
+
+      doc.addFileToVFS("TimesNewRoman.ttf", timesFontBase64);
+      doc.addFont("TimesNewRoman.ttf", "TimesNewRoman", "normal");
+      doc.setFont("TimesNewRoman");
+
+      // Başlık (daha büyük ve ortalanmış)
+      doc.setFontSize(14);
+      doc.text("Envanter Listesi", doc.internal.pageSize.width / 2, 25, {
+        align: "center",
+      });
+
+      // Veri hazırlama
+      const dataForPDF = filteredRows.map((row) => {
+        return columns
+          .filter((col) => col.field !== "actions")
+          .map((col) => {
+            switch (col.field) {
+              default:
+                return row[col.field] || "";
+            }
+          });
+      });
+
+      // Türkçe karakterleri normalize etme
+      const normalizeHeader = (text) =>
+        text
+          .replace(/ğ/g, "g")
+          .replace(/Ğ/g, "G")
+          .replace(/ü/g, "u")
+          .replace(/Ü/g, "U")
+          .replace(/ş/g, "s")
+          .replace(/Ş/g, "S")
+          .replace(/ı/g, "i")
+          .replace(/İ/g, "I")
+          .replace(/ç/g, "c")
+          .replace(/Ç/g, "C")
+          .replace(/ö/g, "o")
+          .replace(/Ö/g, "O");
+
+      // Sütun başlıkları
+      const tableColumn = columns
+        .filter((col) => col.field !== "actions")
+        .map((col) => normalizeHeader(col.headerName));
+
+      const columnStyles = {
+        0: { cellWidth: 270 }, // ürün Adı
+        1: { cellWidth: 270 }, // Birim Adı
+        2: { cellWidth: 270 }, // Kayıt Tarihi
+      };
+
+      // Tablo oluşturma
+      autoTable(doc, {
+        head: [tableColumn],
+        body: dataForPDF,
+        startY: 40,
+        styles: {
+          font: "TimesNewRoman",
+          fontSize: 10, // Daha büyük font
+          cellPadding: 4, // Daha fazla padding
+          cellWidth: "wrap",
+          overflow: "linebreak",
+          minCellHeight: 12, // Daha büyük satır yüksekliği
+          lineColor: [0, 0, 0], // Siyah çizgiler
+          lineWidth: 0.5, // Orta kalınlıkta çizgiler
+        },
+        headStyles: {
+          fillColor: [70, 130, 120], // Koyu başlık rengi
+          textColor: 255,
+          fontStyle: "bold",
+          fontSize: 11, // Başlık fontu
+          cellPadding: 5,
+          halign: "center", // Başlık hücrelerini ortala
+        },
+        bodyStyles: {
+          halign: "center", // Tüm hücre içeriklerini ortala
+          valign: "middle",
+        },
+        columnStyles: columnStyles,
+        margin: { horizontal: 10 },
+        pageBreak: "auto",
+        tableWidth: "auto",
+        showHead: "everyPage",
+        didDrawPage: function (data) {
+          // Sayfa numarası
+          doc.setFontSize(10);
+          doc.text(
+            `Sayfa ${data.pageNumber}`,
+            doc.internal.pageSize.width - 30,
+            doc.internal.pageSize.height - 15
+          );
+        },
+      });
+
+      doc.save("Envanter_Listesi.pdf");
+    } catch (error) {
+      console.error("PDF oluşturulurken hata:", error);
+      alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
+    }
+  };
 
   return (
     <div className="main-container">
@@ -221,8 +274,11 @@ const Inventory = () => {
                 className="data-grid"
                 rows={filteredRows}
                 columns={columns}
+                getRowId={(row) => row.baseResponse.id}
                 initialState={{ pagination: { paginationModel } }}
                 pageSizeOptions={[5, 10, 15, 20]}
+                exportToExcel={exportToExcel}
+                exportToPDF={exportToPDF}
                 disableColumnResize
                 disableColumnFilter
                 localeText={{

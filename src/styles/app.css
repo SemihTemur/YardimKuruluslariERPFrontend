@@ -8,6 +8,7 @@
 .container {
   display: flex;
   position: relative;
+  width: 100vw;
 }
 
 .box {
@@ -20,8 +21,8 @@
   min-height: 100vh;
 }
 
-@media screen and (max-width:768px) {
-  .box{
+@media screen and (max-width: 768px) {
+  .box {
     position: absolute;
     left: 0;
   }

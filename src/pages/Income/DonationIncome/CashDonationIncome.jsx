@@ -6,24 +6,27 @@ import Tooltip from "@mui/material/Tooltip";
 import SearchIcon from "@mui/icons-material/Search";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { FaFilePdf } from "react-icons/fa";
-import * as XLSX from "xlsx";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import useApi from "../../../hooks/useApi .js";
 import "../../../styles/table-global.css";
+import * as XLSX from "xlsx";
+import { useSpecificState } from "../../../hooks/useSpecificState.js";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const CashDonationIncome = () => {
   const { makeRequest } = useApi();
 
-  const [loading, setLoading] = useState(false);
-
-  const [filteredRows, setFilteredRows] = useState(null);
-
-  const [data, setData] = useState(null);
-
-  const [searchText, setSearchText] = useState("");
-
-  const tableTitle = "Nakdi Gelir Listesi";
+  const {
+    data,
+    setData,
+    loading,
+    setLoading,
+    filteredRows,
+    setFilteredRows,
+    searchText,
+    tableTitle,
+    handleSearch,
+  } = useSpecificState("Nakdi Gelirler Listesi");
 
   const paginationModel = { page: 0, pageSize: 5 };
 
@@ -42,120 +45,23 @@ const CashDonationIncome = () => {
     },
     {
       field: "amount",
-      headerName: "Tutar",
-      width: 150,
+      headerName: "Bağışlanan miktar",
+      width: 350,
       disableColumnMenu: true,
     },
   ];
 
-  const exportToExcel = () => {
-    // "İşlemler" sütununu kaldırmak için filteredRows'dan bu sütunu çıkarıyoruz
-    const filteredRowsWithoutOperations = filteredRows.map((row) => {
-      const { actions, ...rest } = row; // "actions" sütununu çıkarıyoruz
-      return rest;
-    });
-
-    // "İşlemler" sütununu columns'dan çıkarıyoruz
-    const columnsWithoutOperations = columns.filter(
-      (col) => col.field !== "actions"
-    );
-
-    // Excel'e aktarılacak veriyi oluşturuyoruz
-    const dataForExcel = filteredRowsWithoutOperations.map((row) => {
-      // Sadece columnsWithoutOperations'daki sütunları alıyoruz
-      return columnsWithoutOperations.map((col) => row[col.field] || "");
-    });
-
-    // Başlıkları ve verileri birleştiriyoruz
-    const excelData = [
-      columnsWithoutOperations.map((col) => col.headerName), // Başlıklar
-      ...dataForExcel, // Veriler
-    ];
-
-    // Excel dosyasını oluşturuyoruz
-    const worksheet = XLSX.utils.aoa_to_sheet(excelData); // Array of Arrays (aoa) kullanıyoruz
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
-
-    // Excel dosyasını indiriyoruz
-    XLSX.writeFile(workbook, `${tableTitle}.xlsx`);
-  };
-
-  const exportToPDF = async () => {
-    const doc = new jsPDF();
-
-    try {
-      // ✅ Base64 font dosyasını HTTP üzerinden oku
-      const response = await fetch("/fonts/times-base64.txt");
-      if (!response.ok) {
-        throw new Error("Font dosyası bulunamadı veya yüklenemedi.");
-      }
-      const timesFontBase64 = await response.text();
-
-      // ✅ 1. Fontu jsPDF'in sanal dosya sistemine (VFS) ekle
-      doc.addFileToVFS("TimesNewRoman.ttf", timesFontBase64);
-
-      // ✅ 2. Fontu jsPDF'e tanıt
-      doc.addFont("TimesNewRoman.ttf", "TimesNewRoman", "normal");
-
-      // ✅ 3. Fontu kullan
-      doc.setFont("TimesNewRoman");
-
-      // Başlık ekleme
-      doc.text(tableTitle, 15, 10);
-
-      // "İşlemler" sütununu kaldır
-      const filteredRowsWithoutOperations = filteredRows.map((row) => {
-        const { actions, ...rest } = row;
-        return rest;
-      });
-
-      const columnsWithoutOperations = columns.filter(
-        (col) => col.field !== "actions"
-      );
-
-      // Tablo başlık ve satırlarını oluştur
-      const tableColumn = columnsWithoutOperations.map((col) => col.headerName);
-      const tableRows = filteredRowsWithoutOperations.map((row) =>
-        columnsWithoutOperations.map((col) => row[col.field] || "")
-      );
-
-      // Tabloyu ekle
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 20,
-        styles: { font: "TimesNewRoman" }, // Font stilini belirt
-      });
-
-      // PDF'i kaydet
-      doc.save(`${tableTitle}.pdf`);
-    } catch (error) {
-      console.error("Font yüklenirken hata oluştu:", error);
-    }
-  };
-
-  // Arama fonksiyonu
-  const handleSearch = (event) => {
-    const value = event.target.value.toLowerCase();
-    setSearchText(value);
-
-    const filteredData = data.filter((row) =>
-      Object.values(row).some(
-        (field) => field && field.toString().toLowerCase().includes(value)
-      )
-    );
-
-    setFilteredRows(filteredData);
-  };
-
   const getCashDonationIncomeList = async () => {
-    const cashDonationIncomeData = await makeRequest(
-      "get",
-      "getCashDonationList"
-    );
-    setData(cashDonationIncomeData);
-    setLoading(true);
+    try {
+      const response = await makeRequest("get", "getCashDonationList");
+      setLoading(true);
+      setData(response.data);
+    } catch (error) {
+      toast.error(
+        "Envanter verileri alınırken hata oluştu:",
+        error.response.data.data
+      );
+    }
   };
 
   useEffect(() => {
@@ -163,24 +69,184 @@ const CashDonationIncome = () => {
   }, []);
 
   useEffect(() => {
+    let totalDonated = 0;
+
     if (data) {
-      const result = Object.values(
+      let result = Object.values(
         data.reduce((acc, curr) => {
-          let key = `${curr.donorFirstName} ${curr.donorLastName}`; // İsim-Soyisim bazlı anahtar oluştur
-
+          const key = `${curr.donorFirstName} ${curr.donorLastName}`;
+          totalDonated += curr.amount;
           if (!acc[key]) {
-            acc[key] = { ...curr }; // Eğer daha önce eklenmemişse direkt ekle
+            acc[key] = { ...curr };
           } else {
-            acc[key].amount += curr.amount; // Eğer zaten varsa amount'u topla
+            acc[key].amount += curr.amount;
           }
-
           return acc;
         }, {})
       );
-      setFilteredRows(result); // Burada toplam bağışları güncelleriz
-      console.log(result); // Konsola yazdır
+
+      let totalDonation = {
+        amount: `Toplam bağışlanan miktar: ${totalDonated}`,
+        baseResponse: {
+          id: "TOTAL_DONATION_ROW",
+          createdDate: new Date().toISOString().split("T")[0],
+          modifiedDate: new Date().toISOString().split("T")[0],
+        },
+        donorFirstName: "",
+        donorLastName: "",
+        currency: "TRY",
+      };
+
+      // Eğer son eleman zaten TOTAL_DONATION_ROW ise, ekleme
+      if (
+        result[result.length - 1]?.baseResponse?.id !== "TOTAL_DONATION_ROW"
+      ) {
+        result.push(totalDonation);
+      }
+
+      setFilteredRows(result);
     }
   }, [data]);
+
+  const exportToExcel = () => {
+    const filteredRowsWithoutOperations = filteredRows.map((row) => {
+      const { actions, ...rest } = row;
+      return rest;
+    });
+
+    const columnsWithoutOperations = columns.filter(
+      (col) => col.field && col.field !== "actions"
+    );
+
+    const dataForExcel = filteredRowsWithoutOperations.map((row) => {
+      return columnsWithoutOperations.map((col) => {
+        switch (col.field) {
+          default:
+            return row[col.field] || "";
+        }
+      });
+    });
+
+    const excelData = [
+      columnsWithoutOperations.map((col) => col.headerName),
+      ...dataForExcel,
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
+    XLSX.writeFile(workbook, "Nakdi Gelirler Listesi.xlsx");
+  };
+
+  const exportToPDF = async () => {
+    // Yatay modda A4 boyutu (daha fazla alan sağlar)
+    const doc = new jsPDF("l", "pt", "a4");
+
+    try {
+      // Font yükleme
+      const response = await fetch("/fonts/times-base64.txt");
+      if (!response.ok)
+        throw new Error("Font dosyası bulunamadı veya yüklenemedi.");
+      const timesFontBase64 = await response.text();
+
+      doc.addFileToVFS("TimesNewRoman.ttf", timesFontBase64);
+      doc.addFont("TimesNewRoman.ttf", "TimesNewRoman", "normal");
+      doc.setFont("TimesNewRoman");
+
+      // Başlık (daha büyük ve ortalanmış)
+      doc.setFontSize(14);
+      doc.text("Nakdi Gelirler Listesi", doc.internal.pageSize.width / 2, 25, {
+        align: "center",
+      });
+
+      // Veri hazırlama
+      const dataForPDF = filteredRows.map((row) => {
+        return columns
+          .filter((col) => col.field !== "actions")
+          .map((col) => {
+            switch (col.field) {
+              default:
+                return row[col.field] || "";
+            }
+          });
+      });
+
+      // Türkçe karakterleri normalize etme
+      const normalizeHeader = (text) =>
+        text
+          .replace(/ğ/g, "g")
+          .replace(/Ğ/g, "G")
+          .replace(/ü/g, "u")
+          .replace(/Ü/g, "U")
+          .replace(/ş/g, "s")
+          .replace(/Ş/g, "S")
+          .replace(/ı/g, "i")
+          .replace(/İ/g, "I")
+          .replace(/ç/g, "c")
+          .replace(/Ç/g, "C")
+          .replace(/ö/g, "o")
+          .replace(/Ö/g, "O");
+
+      // Sütun başlıkları
+      const tableColumn = columns
+        .filter((col) => col.field !== "actions")
+        .map((col) => normalizeHeader(col.headerName));
+
+      const columnStyles = {
+        0: { cellWidth: 270 },
+        1: { cellWidth: 270 },
+        2: { cellWidth: 270 },
+      };
+
+      // Tablo oluşturma
+      autoTable(doc, {
+        head: [tableColumn],
+        body: dataForPDF,
+        startY: 40,
+        styles: {
+          font: "TimesNewRoman",
+          fontSize: 10, // Daha büyük font
+          cellPadding: 4, // Daha fazla padding
+          cellWidth: "wrap",
+          overflow: "linebreak",
+          minCellHeight: 12, // Daha büyük satır yüksekliği
+          lineColor: [0, 0, 0], // Siyah çizgiler
+          lineWidth: 0.5, // Orta kalınlıkta çizgiler
+        },
+        headStyles: {
+          fillColor: [70, 130, 120], // Koyu başlık rengi
+          textColor: 255,
+          fontStyle: "bold",
+          fontSize: 11, // Başlık fontu
+          cellPadding: 5,
+          halign: "center", // Başlık hücrelerini ortala
+        },
+        bodyStyles: {
+          halign: "center", // Tüm hücre içeriklerini ortala
+          valign: "middle",
+        },
+        columnStyles: columnStyles,
+        margin: { horizontal: 10 },
+        pageBreak: "auto",
+        tableWidth: "auto",
+        showHead: "everyPage",
+        didDrawPage: function (data) {
+          // Sayfa numarası
+          doc.setFontSize(10);
+          doc.text(
+            `Sayfa ${data.pageNumber}`,
+            doc.internal.pageSize.width - 30,
+            doc.internal.pageSize.height - 15
+          );
+        },
+      });
+
+      doc.save("Nakdi Gelirler_Listesi.pdf");
+    } catch (error) {
+      console.error("PDF oluşturulurken hata:", error);
+      alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
+    }
+  };
 
   return (
     <div className="main-container">
@@ -232,8 +298,11 @@ const CashDonationIncome = () => {
                 className="data-grid"
                 rows={filteredRows}
                 columns={columns}
+                getRowId={(row) => row.baseResponse.id}
                 initialState={{ pagination: { paginationModel } }}
                 pageSizeOptions={[5, 10, 15, 20]}
+                exportToExcel={exportToExcel}
+                exportToPDF={exportToPDF}
                 disableColumnResize
                 disableColumnFilter
                 localeText={{

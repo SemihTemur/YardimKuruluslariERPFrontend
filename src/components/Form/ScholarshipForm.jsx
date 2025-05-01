@@ -59,12 +59,12 @@ const ScholarshipForm = ({ process, buttonTitle }) => {
   // gelen veriyi select 2'ye uygun hala getırıyorum.ve filteredDonorName'e aktarıyorum
   useEffect(() => {
     if (loading) {
-      const familyNames = studentData.map((item) => ({
+      const studentNames = studentData.map((item) => ({
         value: `${item.studentName} ${item.studentSurname}`,
         label: `${item.studentName} ${item.studentSurname}`, // React Select için uygun formatta düzenleme
       }));
 
-      setFilteredStudentNames(familyNames);
+      setFilteredStudentNames(studentNames);
       console.log(process);
       // eüer işlem update ise başlangıcta kaydedılen degerı goster guncelleme ekranında
       if (process === "update") {
@@ -86,7 +86,6 @@ const ScholarshipForm = ({ process, buttonTitle }) => {
     if (loading && period) {
       setFieldValue("period", period.value);
       if (period.value === "Tek Seferlik") setFieldValue("duration", 1);
-      else setFieldValue("duration", "");
     }
   }, [period]);
 
@@ -125,7 +124,7 @@ const ScholarshipForm = ({ process, buttonTitle }) => {
                     .toLocaleLowerCase("tr")
                     .includes(input.toLocaleLowerCase("tr"))
                 }
-                placeholder="Bağışçı seçiniz"
+                placeholder="Öğrenci seçiniz"
               />
               <ErrorMessage
                 name="studentName"
@@ -200,7 +199,7 @@ const ScholarshipForm = ({ process, buttonTitle }) => {
                 type="text"
                 name="duration"
                 className="form__input"
-                readOnly={!!values.duration}
+                readOnly={values.period == "Tek Seferlik"}
               />
               <ErrorMessage
                 name="duration"

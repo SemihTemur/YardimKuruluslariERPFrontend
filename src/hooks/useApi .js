@@ -1,11 +1,7 @@
-import { useState } from "react";
 import apiService from "../services/apiService"; // API servis dosyanızı içe aktarın
 
 const useApi = () => {
-  const [error, setError] = useState(null);
-
   const makeRequest = async (method, endpoint, values = null, id = null) => {
-    setError(null);
     try {
       let response;
       if (method === "get") {
@@ -19,11 +15,11 @@ const useApi = () => {
       }
       return response;
     } catch (err) {
-      setError(err);
+      throw err;
     }
   };
 
-  return { error, makeRequest };
+  return { makeRequest };
 };
 
 export default useApi;

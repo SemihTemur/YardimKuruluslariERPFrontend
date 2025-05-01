@@ -10,6 +10,9 @@ import FormDialog from "../../components/Dialog/FormScreenDialog/FormDialog.jsx"
 import DeleteScreenDialog from "../../components/Dialog/DeleteScreenDialog/DeleteScreenDialog.jsx";
 import Table from "../../components/UI/Table/Table.jsx";
 import FamilyForm from "../../components/Form/FamilyForm.jsx";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Family = () => {
   const { makeRequest } = useApi();
@@ -23,6 +26,7 @@ const Family = () => {
     setData,
     loading,
     setLoading,
+    updatedDatas,
     selectedData,
     isAddOpen,
     isUpdatedOpen,
@@ -111,18 +115,31 @@ const Family = () => {
         return <div>{params.row?.address?.street || "Sokak Yok"}</div>;
       },
     },
-
     {
       field: "createdDate",
       headerName: "Kayıt Tarihi",
       width: 150,
       disableColumnMenu: true,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params.row?.baseResponse?.createdDate || "Oluşturulma Tarihi Yok."}
+          </div>
+        );
+      },
     },
     {
       field: "modifiedDate",
       headerName: "Güncellenme Tarihi",
       width: 150,
       disableColumnMenu: true,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params.row?.baseResponse?.modifiedDate || "Güncelleme Tarihi Yok."}
+          </div>
+        );
+      },
     },
 
     selectedRows.length < 2
@@ -136,13 +153,15 @@ const Family = () => {
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => openDeleteDialog(params.row.id)}
+                onClick={() => openDeleteDialog(params.row.baseResponse.id)}
               >
                 Sil
               </Button>
               <Button
                 variant="contained"
-                onClick={() => openUpdateScreen(params.row, params.row.id)}
+                onClick={() =>
+                  openUpdateScreen(params.row, params.row.baseResponse.id)
+                }
               >
                 Güncelle
               </Button>
@@ -153,85 +172,81 @@ const Family = () => {
       : {},
   ];
 
-  const updatedData = (values, process = "update") => {
-    if (process === "update") {
-      return data.map((item) => {
-        if (item.id === selectedId) {
-          const today = new Date();
-          const formattedDate = `${today.getFullYear()}-${String(
-            today.getMonth() + 1
-          ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-          return { ...item, ...values, modifiedDate: formattedDate };
-        }
-        return item;
-      });
-    } else {
-      return data.filter((item) => item.id !== selectedId);
-    }
-  };
-
-  const getFamilyList = async () => {
-    try {
-      const familyData = await makeRequest("get", "getFamilyList");
-      if (familyData) {
-        setData(familyData);
-        setLoading(true);
-      }
-    } catch (error) {
-      console.error("Bağış verileri alınırken hata oluştu:", error);
-      setLoading(false);
-    }
-  };
-
   // list
   useEffect(() => {
     getFamilyList();
   }, []);
 
+  const getFamilyList = async () => {
+    try {
+      const response = await makeRequest("get", "getFamilyList");
+      setLoading(true);
+      setData(response.data);
+    } catch (error) {
+      toast.error(
+        "Aile verileri alınırken hata oluştu:",
+        error.response.data.data
+      );
+    }
+  };
+
   // Save
   const saveFamily = async (values, { resetForm }) => {
     try {
-      await makeRequest("post", "saveFamily", values);
-
-      const newData = await makeRequest("get", "getFamilyList");
-      setData(newData);
-
-      toast.success("Bağış başarıyla kaydedildi!");
-      resetForm();
-      onCloseScreenDelay();
+      const response = await makeRequest("post", "saveFamily", values);
+      updatedDatas(response.data, "save");
+      toast.success("Aile başarıyla kaydedildi!");
     } catch (error) {
-      toast.error(
-        "Bağış kaydedilemedi! Lütfen tekrar deneyin veya destek ekibiyle iletişime geçin."
-      );
-      console.log(error);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.data || "Bir hata oluştu.");
+      } else {
+        toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
+      }
     }
+    resetForm();
+    onCloseScreenDelay();
   };
 
   // Update
   const updateFamilyById = async (values) => {
-    console.log(values);
     try {
-      await makeRequest("put", "updateFamilyById", values, selectedId);
-      setData(updatedData(values));
-      toast.success("Bağış başarıyla güncellendi!");
-      onCloseScreenDelay();
-    } catch (error) {
-      toast.error(
-        "Bağış güncellenemedi! Lütfen tekrar deneyin veya destek ekibiyle iletişime geçin."
+      const response = await makeRequest(
+        "put",
+        "updateFamilyById",
+        values,
+        selectedId
       );
+      updatedDatas(response.data, "update");
+      toast.success("Aile başarıyla güncellendi!");
+    } catch (error) {
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.data || "Bir hata oluştu.");
+      } else {
+        toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
+      }
     }
+    onCloseScreenDelay();
     setIsUpdatedOpen(false);
   };
 
   // Deletes
   const deleteFamilyById = async () => {
     try {
-      await makeRequest("delete", "deleteFamilyById", null, selectedId);
-      setData(updatedData(null, "delete"));
-      toast.success("Bağış başarıyla silindi!");
+      const response = await makeRequest(
+        "delete",
+        "deleteFamilyById",
+        null,
+        selectedId
+      );
+
+      updatedDatas(response.data, "delete");
+      toast.success("Aile başarıyla silindi!");
     } catch (error) {
-      toast.error("Bağış silinemedi! Lütfen tekrar deneyin.");
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.data || "Bir hata oluştu.");
+      } else {
+        toast.error("Bağlantı hatası. Lütfen tekrar deneyin.");
+      }
     }
     setIsDeletedOpen(false);
   };
@@ -239,19 +254,198 @@ const Family = () => {
   const deleteSelectedFamilys = async () => {
     try {
       for (const row of selectedRows) {
-        await makeRequest("delete", "deleteFamilyById", null, row);
+        const response = await makeRequest(
+          "delete",
+          "deleteFamilyById",
+          null,
+          row
+        );
+        updatedDatas(response.data, "delete");
       }
-      toast.success("Silindi!");
+      toast.success("Aileler başarıyla silindi!");
     } catch (error) {
-      toast.error("Silinemedi.");
+      toast.error("Aileler silinemedi! Lütfen tekrar deneyin.");
     }
-    // Silme işleminden sonra veriyi güncelle
-    const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row === item.id)
-    );
-    setData(updatedData);
+
     setSelectedRows([]); // Seçimi sıfırla
     setIsDeletedOpen(false);
+  };
+
+  const exportToExcel = () => {
+    const filteredRowsWithoutOperations = filteredRows.map((row) => {
+      const { actions, ...rest } = row;
+      return rest;
+    });
+
+    const columnsWithoutOperations = columns.filter(
+      (col) => col.field && col.field !== "actions"
+    );
+
+    const dataForExcel = filteredRowsWithoutOperations.map((row) => {
+      return columnsWithoutOperations.map((col) => {
+        switch (col.field) {
+          case "city":
+            return row.address?.city || "";
+          case "district":
+            return row.address?.district || "";
+          case "neighborhood":
+            return row.address?.neighborhood || "";
+          case "street":
+            return row.address?.street || "";
+          case "createdDate":
+            return row.baseResponse?.createdDate || "";
+          case "modifiedDate":
+            return row.baseResponse?.modifiedDate || "";
+          default:
+            return row[col.field] || "";
+        }
+      });
+    });
+
+    const excelData = [
+      columnsWithoutOperations.map((col) => col.headerName),
+      ...dataForExcel,
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
+    XLSX.writeFile(workbook, "Aileler Listesi.xlsx");
+  };
+
+  const exportToPDF = async () => {
+    // Yatay modda A4 boyutu (daha fazla alan sağlar)
+    const doc = new jsPDF("l", "pt", "a4");
+
+    try {
+      // Font yükleme
+      const response = await fetch("/fonts/times-base64.txt");
+      if (!response.ok)
+        throw new Error("Font dosyası bulunamadı veya yüklenemedi.");
+      const timesFontBase64 = await response.text();
+
+      doc.addFileToVFS("TimesNewRoman.ttf", timesFontBase64);
+      doc.addFont("TimesNewRoman.ttf", "TimesNewRoman", "normal");
+      doc.setFont("TimesNewRoman");
+
+      // Başlık (daha büyük ve ortalanmış)
+      doc.setFontSize(14);
+      doc.text("Aileler Listesi", doc.internal.pageSize.width / 2, 25, {
+        align: "center",
+      });
+
+      // Veri hazırlama
+      const dataForPDF = filteredRows.map((row) => {
+        return columns
+          .filter((col) => col.field !== "actions")
+          .map((col) => {
+            switch (col.field) {
+              case "city":
+                return row.address?.city || "";
+              case "district":
+                return row.address?.district || "";
+              case "neighborhood":
+                return row.address?.neighborhood || "";
+              case "street":
+                return row.address?.street || "";
+              case "createdDate":
+                return row.baseResponse?.createdDate
+                  ? new Date(row.baseResponse.createdDate).toLocaleDateString()
+                  : "";
+              case "modifiedDate":
+                return row.baseResponse?.modifiedDate
+                  ? new Date(row.baseResponse.modifiedDate).toLocaleDateString()
+                  : "";
+              default:
+                return row[col.field] || "";
+            }
+          });
+      });
+
+      // Türkçe karakterleri normalize etme
+      const normalizeHeader = (text) =>
+        text
+          .replace(/ğ/g, "g")
+          .replace(/Ğ/g, "G")
+          .replace(/ü/g, "u")
+          .replace(/Ü/g, "U")
+          .replace(/ş/g, "s")
+          .replace(/Ş/g, "S")
+          .replace(/ı/g, "i")
+          .replace(/İ/g, "I")
+          .replace(/ç/g, "c")
+          .replace(/Ç/g, "C")
+          .replace(/ö/g, "o")
+          .replace(/Ö/g, "O");
+
+      // Sütun başlıkları
+      const tableColumn = columns
+        .filter((col) => col.field !== "actions")
+        .map((col) => normalizeHeader(col.headerName));
+
+      // Özel sütun genişlikleri (fotoğraftaki gibi düzen)
+      const columnStyles = {
+        0: { cellWidth: 80 },
+        1: { cellWidth: 80 },
+        2: { cellWidth: 80 },
+        3: { cellWidth: 80 },
+        4: { cellWidth: 80 },
+        5: { cellWidth: 80 },
+        6: { cellWidth: 80 },
+        7: { cellWidth: 80 },
+        8: { cellWidth: 80 },
+        9: { cellWidth: 80 },
+        10: { cellWidth: 80 },
+      };
+
+      // Tablo oluşturma
+      autoTable(doc, {
+        head: [tableColumn],
+        body: dataForPDF,
+        startY: 40,
+        styles: {
+          font: "TimesNewRoman",
+          fontSize: 10, // Daha büyük font
+          cellPadding: 4, // Daha fazla padding
+          cellWidth: "wrap",
+          overflow: "linebreak",
+          minCellHeight: 12, // Daha büyük satır yüksekliği
+          lineColor: [0, 0, 0], // Siyah çizgiler
+          lineWidth: 0.5, // Orta kalınlıkta çizgiler
+        },
+        headStyles: {
+          fillColor: [70, 130, 120], // Koyu başlık rengi
+          textColor: 255,
+          fontStyle: "bold",
+          fontSize: 11, // Başlık fontu
+          cellPadding: 5,
+          halign: "center", // Başlık hücrelerini ortala
+        },
+        bodyStyles: {
+          halign: "center", // Tüm hücre içeriklerini ortala
+          valign: "middle",
+        },
+        columnStyles: columnStyles,
+        margin: { horizontal: 10 },
+        pageBreak: "auto",
+        tableWidth: "auto",
+        showHead: "everyPage",
+        didDrawPage: function (data) {
+          // Sayfa numarası
+          doc.setFontSize(10);
+          doc.text(
+            `Sayfa ${data.pageNumber}`,
+            doc.internal.pageSize.width - 30,
+            doc.internal.pageSize.height - 15
+          );
+        },
+      });
+
+      doc.save("Bağışçılar_Listesi.pdf");
+    } catch (error) {
+      console.error("PDF oluşturulurken hata:", error);
+      alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
+    }
   };
 
   return (
@@ -286,6 +480,8 @@ const Family = () => {
             filteredRows={filteredRows}
             columns={columns}
             paginationModel={paginationModel}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
             selectedRows={selectedRows}
             setSelectedRows={setSelectedRows}
             openDeleteDialog={openDeleteDialog}
@@ -318,7 +514,6 @@ const Family = () => {
               }
             />
           )}
-          <Toaster position="top-center" reverseOrder={false} />
         </>
       )}
     </div>

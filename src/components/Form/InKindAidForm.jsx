@@ -223,6 +223,7 @@ const InKindAidForm = ({ process, buttonTitle }) => {
                 options={filteredItem}
                 isSearchable={true}
                 placeholder="Ürün seçiniz"
+                isDisabled={process == "update"}
               />
               <ErrorMessage
                 name="category.itemName"
@@ -242,6 +243,7 @@ const InKindAidForm = ({ process, buttonTitle }) => {
                 options={filteredUnit}
                 isSearchable={true}
                 placeholder="Birim seçiniz"
+                isDisabled={process == "update"}
               />
               <ErrorMessage
                 name="category.unit"
@@ -257,18 +259,6 @@ const InKindAidForm = ({ process, buttonTitle }) => {
               <Field type="text" name="quantity" className="form__input" />
               <ErrorMessage
                 name="quantity"
-                component="p"
-                className="input-error"
-              />
-            </div>
-          </div>
-
-          <div className="form-container__content">
-            <Label text="Süre:" />
-            <div className="form-container__content__input-group">
-              <Field type="text" name="duration" className="form__input" />
-              <ErrorMessage
-                name="duration"
                 component="p"
                 className="input-error"
               />
@@ -293,6 +283,18 @@ const InKindAidForm = ({ process, buttonTitle }) => {
               />
               <ErrorMessage
                 name="period"
+                component="p"
+                className="input-error"
+              />
+            </div>
+          </div>
+
+          <div className="form-container__content">
+            <Label text="Süre:" />
+            <div className="form-container__content__input-group">
+              <Field type="text" name="duration" className="form__input" />
+              <ErrorMessage
+                name="duration"
                 component="p"
                 className="input-error"
               />

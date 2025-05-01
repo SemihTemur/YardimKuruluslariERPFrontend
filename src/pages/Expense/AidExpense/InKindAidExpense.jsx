@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Skeleton, Box } from "@mui/material";
@@ -7,13 +7,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { FaFilePdf } from "react-icons/fa";
 import useApi from "../../../hooks/useApi .js";
-import "../../../styles/table-global.css";
-import { useSpecificState } from "../../../hooks/useSpecificState.js";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useSpecificState } from "../../../hooks/useSpecificState.js";
+import "../../../styles/table-global.css";
 
-const InKindDonationIncome = () => {
+const InKindAidExpense = () => {
   const { makeRequest } = useApi();
 
   const {
@@ -26,20 +26,14 @@ const InKindDonationIncome = () => {
     searchText,
     tableTitle,
     handleSearch,
-  } = useSpecificState("Ayni Gelirler Listesi");
+  } = useSpecificState("Nakdi Giderler Listesi");
 
   const paginationModel = { page: 0, pageSize: 5 };
 
   const columns = [
     {
-      field: "donorFirstName",
-      headerName: "Bağışçı Adı",
-      width: 150,
-      disableColumnMenu: true,
-    },
-    {
-      field: "donorLastName",
-      headerName: "Bağışçı Soyadı",
+      field: "familyName",
+      headerName: "Aile Adı",
       width: 150,
       disableColumnMenu: true,
     },
@@ -64,47 +58,47 @@ const InKindDonationIncome = () => {
     },
 
     {
-      field: "quantity",
+      field: "totalDistributedQuantity",
       headerName: "Miktar",
       width: 150,
       disableColumnMenu: true,
     },
   ];
 
-  const getInKindDonationIncomeList = async () => {
+  const getInKindAidList = async () => {
     try {
-      const response = await makeRequest("get", "getInKindDonationList");
+      const response = await makeRequest("get", "getInKindAidList");
       setLoading(true);
       setData(response.data);
     } catch (error) {
       toast.error(
-        "Envanter verileri alınırken hata oluştu:",
+        "Ayni yardım giderleri verileri alınırken hata oluştu:",
         error.response.data.data
       );
     }
   };
 
   useEffect(() => {
-    getInKindDonationIncomeList();
+    getInKindAidList();
   }, []);
 
   useEffect(() => {
+    let totalDonated = 0;
+
     if (data) {
-      const result = Object.values(
+      let result = Object.values(
         data.reduce((acc, curr) => {
-          let key = `${curr.donorFirstName} ${curr.donorLastName} ${curr.category.itemName}`;
-
+          const key = `${curr.familyName} ${curr.category.itemName}`;
           if (!acc[key]) {
-            acc[key] = { ...curr }; // Eğer daha önce eklenmemişse direkt ekle
+            acc[key] = { ...curr };
           } else {
-            acc[key].quantity += curr.quantity; // Eğer zaten varsa amount'u topla
+            acc[key].totalDistributedQuantity += curr.totalDistributedQuantity;
           }
-
           return acc;
         }, {})
       );
-      setFilteredRows(result); // Burada toplam bağışları güncelleriz
-      console.log(result); // Konsola yazdır
+
+      setFilteredRows(result);
     }
   }, [data]);
 
@@ -139,7 +133,7 @@ const InKindDonationIncome = () => {
     const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
-    XLSX.writeFile(workbook, "Ayni Gelirler Listesi.xlsx");
+    XLSX.writeFile(workbook, "Ayni Yardım Giderleri Listesi.xlsx");
   };
 
   const exportToPDF = async () => {
@@ -159,9 +153,14 @@ const InKindDonationIncome = () => {
 
       // Başlık (daha büyük ve ortalanmış)
       doc.setFontSize(14);
-      doc.text("Ayni Gelirler Listesi", doc.internal.pageSize.width / 2, 25, {
-        align: "center",
-      });
+      doc.text(
+        "Ayni Yardım Giderleri Listesi",
+        doc.internal.pageSize.width / 2,
+        25,
+        {
+          align: "center",
+        }
+      );
 
       // Veri hazırlama
       const dataForPDF = filteredRows.map((row) => {
@@ -200,16 +199,11 @@ const InKindDonationIncome = () => {
         .filter((col) => col.field !== "actions")
         .map((col) => normalizeHeader(col.headerName));
 
-      // Özel sütun genişlikleri (fotoğraftaki gibi düzen)
       const columnStyles = {
-        0: { cellWidth: 165 },
-        1: { cellWidth: 165 },
-        2: { cellWidth: 165 },
-        3: { cellWidth: 165 },
-        4: { cellWidth: 165 },
-        5: { cellWidth: 165 },
-        6: { cellWidth: 165 },
-        7: { cellWidth: 165 },
+        0: { cellWidth: 120 },
+        1: { cellWidth: 120 },
+        0: { cellWidth: 120 },
+        1: { cellWidth: 120 },
       };
 
       // Tablo oluşturma
@@ -255,7 +249,7 @@ const InKindDonationIncome = () => {
         },
       });
 
-      doc.save("Ayni Gelirler_Listesi.pdf");
+      doc.save("Ayni Yardım Giderleri_Listesi.pdf");
     } catch (error) {
       console.error("PDF oluşturulurken hata:", error);
       alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
@@ -339,4 +333,4 @@ const InKindDonationIncome = () => {
   );
 };
 
-export default InKindDonationIncome;
+export default InKindAidExpense;
