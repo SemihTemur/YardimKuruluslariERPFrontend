@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../Login/login.css";
 import EmailIcon from "@mui/icons-material/Email";
 import KeyIcon from "@mui/icons-material/Key";
@@ -6,7 +6,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Link, useNavigate } from "react-router-dom";
 import useApi from "../../hooks/useApi ";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "../../redux/authSlice";
 
 const Login = () => {
@@ -23,6 +23,8 @@ const Login = () => {
 
   const dispatch = useDispatch();
 
+  const { user } = useSelector((store) => store.auth);
+
   const goToHomePage = () => {
     login();
   };
@@ -35,12 +37,18 @@ const Login = () => {
     try {
       const response = await makeRequest("post", "login", loginRequest);
       dispatch(setToken(response.data));
-      navigate("/home");
+      navigate("/home", { replace: true });
     } catch (error) {
       console.log(error);
       setError(false);
     }
   };
+
+  // eğer bilgiler dogruysa user set edılıp null olmaktan cıkarsa home ekranına gıderken logın componentı'nın
+  // yapısını gormıyelım bos bır ekran gorelım dıye null donduruyorum
+  if (user) {
+    return null;
+  }
 
   return (
     <>

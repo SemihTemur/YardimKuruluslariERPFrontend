@@ -6,25 +6,27 @@ import { RouterConfig } from "./routes/RouterConfig";
 import { Box } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { markAuthChecked } from "./redux/authSlice";
+import { logoutUser, markAuthChecked } from "./redux/authSlice";
 
 function App() {
-  const dispatch = useDispatch();
-  const { isAuthChecked } = useSelector((state) => state.auth);
+  // const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const isAuthPage =
     location.pathname === "/" || location.pathname === "/forgot-password";
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    if (!isAuthChecked) {
-      dispatch(markAuthChecked());
+    if (isAuthPage) {
+      dispatch(logoutUser());
     }
-  }, []);
+  }, [location.pathname]);
 
   return (
     <>
-      {!isAuthPage ? (
+      {user ? (
         <div className="container">
           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
           <Box className="box">

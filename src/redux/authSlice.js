@@ -12,27 +12,23 @@ const getInitialState = () => {
       if (decoded.exp && decoded.exp > currentTime) {
         return {
           user: decoded,
-          isAuthChecked: true,
         };
       } else {
         localStorage.removeItem("token");
         return {
           user: null,
-          isAuthChecked: true,
         };
       }
     } catch (e) {
       localStorage.removeItem("token");
       return {
         user: null,
-        isAuthChecked: true,
       };
     }
   }
 
   return {
     user: null,
-    isAuthChecked: true,
   };
 };
 
@@ -49,18 +45,16 @@ const authSlice = createSlice({
     // Logout işlemi
     logoutUser: (state) => {
       state.user = null;
-      state.isAuthChecked = true;
       localStorage.removeItem("token");
     },
     // Auth kontrolünü tamamla (token yoksa bile)
-    markAuthChecked: (state) => {
-      state.isAuthChecked = true;
-    },
+    // markAuthChecked: (state) => {
+    //   state.isAuthChecked = true;
+    // },
     // Token'ı doğrudan set etmek için (login sonrası)
     setToken: (state, action) => {
       const decoded = jwtDecode(action.payload);
       state.user = decoded;
-      state.isAuthChecked = true;
       localStorage.setItem("token", action.payload);
     },
   },
