@@ -3,7 +3,7 @@ import { useGlobalState } from "../../hooks/useGlobalState.js";
 import useApi from "../../hooks/useApi .js";
 import Button from "@mui/material/Button";
 import { Skeleton, Box } from "@mui/material";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { userInitialValues } from "../../formik&yup/initalValues.js";
 import { userYup } from "../../formik&yup/yup.js";
 import "../../styles/table-global.css";
@@ -49,7 +49,14 @@ const User = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Kullanıcı", categoryInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "CUSTOMUSER",
+    "Kullanıcı",
+    userInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -65,13 +72,7 @@ const User = () => {
       disableColumnMenu: true,
     },
     {
-      field: "password",
-      headerName: "Şifre",
-      width: 150,
-      disableColumnMenu: true,
-    },
-    {
-      field: "role",
+      field: "roleName",
       headerName: "Rol",
       width: 150,
       disableColumnMenu: true,
@@ -133,29 +134,37 @@ const User = () => {
   ];
 
   useEffect(() => {
-    getUserList();
-  }, []);
+    if (user) {
+      getUserList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getUserList = async () => {
     try {
-      const response = await makeRequest("get", "getCategoryList");
+      const response = await makeRequest("get", "getUserList");
       setLoading(true);
       setData(response.data);
     } catch (error) {
       toast.error(
-        "Tür verileri alınırken hata oluştu:",
+        "Kullanıcı verileri alınırken hata oluştu:",
         error.response.data.data
       );
     }
   };
 
   // Save
-  const saveCategory = async (values, { resetForm }) => {
+  const saveUser = async (values, { resetForm }) => {
     try {
-      const response = await makeRequest("post", "saveCategory", values);
+      const response = await makeRequest("post", "register", values);
       updatedDatas(response.data, "save");
-      toast.success("Tür başarıyla kaydedildi!");
+      toast.success("Kullanıcı başarıyla kaydedildi!");
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(error.response.data.data || "Bir hata oluştu.");
@@ -169,17 +178,17 @@ const User = () => {
   };
 
   // Update
-  const updateCategoryById = async (values) => {
+  const updateUserById = async (values) => {
     try {
       const response = await makeRequest(
         "put",
-        "updateCategoryById",
+        "updateUserById",
         values,
         selectedId
       );
 
       updatedDatas(response.data, "update");
-      toast.success("Tür başarıyla güncellendi!");
+      toast.success("Kullanıcı başarıyla güncellendi!");
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(error.response.data.data || "Bir hata oluştu.");
@@ -192,16 +201,16 @@ const User = () => {
   };
 
   // Deletes
-  const deleteCategoryById = async () => {
+  const deleteUserById = async () => {
     try {
       const response = await makeRequest(
         "delete",
-        "deleteCategoryById",
+        "deleteUserById",
         null,
         selectedId
       );
       updatedDatas(response.data, "delete");
-      toast.success("Tür başarıyla silindi!");
+      toast.success("Kullanıcı başarıyla silindi!");
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(error.response.data.data || "Bir hata oluştu.");
@@ -212,20 +221,20 @@ const User = () => {
     setIsDeletedOpen(false);
   };
 
-  const deleteSelectedCategories = async () => {
+  const deleteSelectedUsers = async () => {
     try {
       for (const row of selectedRows) {
         const response = await makeRequest(
           "delete",
-          "deleteCategoryById",
+          "deleteUserById",
           null,
           row
         );
         updatedDatas(response.data, "delete");
       }
-      toast.success("Türler başarıyla silindi!");
+      toast.success("Kullanıcılar başarıyla silindi!");
     } catch (error) {
-      toast.error("Türler silinemedi! Lütfen tekrar deneyin.");
+      toast.error("Kullanıcılar silinemedi! Lütfen tekrar deneyin.");
     }
 
     setSelectedRows([]); // Seçimi sıfırla
@@ -263,7 +272,7 @@ const User = () => {
     const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tablo Verileri");
-    XLSX.writeFile(workbook, "Kategoriler Listesi.xlsx");
+    XLSX.writeFile(workbook, "Kullanıcılar Listesi.xlsx");
   };
 
   const exportToPDF = async () => {
@@ -283,7 +292,7 @@ const User = () => {
 
       // Başlık (daha büyük ve ortalanmış)
       doc.setFontSize(14);
-      doc.text("Kategoriler Listesi", doc.internal.pageSize.width / 2, 25, {
+      doc.text("Kullanıcılar Listesi", doc.internal.pageSize.width / 2, 25, {
         align: "center",
       });
 
@@ -329,10 +338,10 @@ const User = () => {
         .map((col) => normalizeHeader(col.headerName));
 
       const columnStyles = {
-        0: { cellWidth: 200 }, // ürün Adı
-        1: { cellWidth: 200 }, // Birim Adı
-        2: { cellWidth: 200 }, // Kayıt Tarihi
-        3: { cellWidth: 200 }, // Güncelleme Tarihi
+        0: { cellWidth: 200 },
+        1: { cellWidth: 200 },
+        2: { cellWidth: 200 },
+        3: { cellWidth: 200 },
       };
 
       // Tablo oluşturma
@@ -378,7 +387,7 @@ const User = () => {
         },
       });
 
-      doc.save("Kategoriler_Listesi.pdf");
+      doc.save("Kullanıcılar_Listesi.pdf");
     } catch (error) {
       console.error("PDF oluşturulurken hata:", error);
       alert("PDF oluşturulurken bir hata oluştu:\n" + error.message);
@@ -428,14 +437,14 @@ const User = () => {
 
           {(isUpdatedOpen || isAddOpen) && (
             <FormDialog
-              Component={CategoryForm}
+              Component={UserForm}
               title={screenTitle}
               buttonTitle={buttonTitle}
               isOpen={isUpdatedOpen || isAddOpen}
               onClose={onCloseScreen}
-              onSubmit={isAddOpen ? saveCategory : updateCategoryById}
+              onSubmit={isAddOpen ? saveUser : updateUserById}
               initialValues={selectedData}
-              validationSchema={categoryYup}
+              validationSchema={userYup}
               process={process}
             />
           )}
@@ -445,9 +454,7 @@ const User = () => {
               openDeleteDialog={openDeleteDialog}
               closeDeleteDialog={closeDeleteDialog}
               deleteCashDonationById={
-                selectedRows.length > 1
-                  ? deleteSelectedCategories
-                  : deleteCategoryById
+                selectedRows.length > 1 ? deleteSelectedUsers : deleteUserById
               }
             />
           )}

@@ -48,7 +48,14 @@ const Student = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Öğrenci", studentInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "STUDENT",
+    "Öğrenci",
+    studentInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -193,8 +200,16 @@ const Student = () => {
   ];
 
   useEffect(() => {
-    getStudentList();
-  }, []);
+    if (user) {
+      getStudentList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getStudentList = async () => {

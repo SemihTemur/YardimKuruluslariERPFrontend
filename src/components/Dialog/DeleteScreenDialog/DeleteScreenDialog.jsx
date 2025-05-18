@@ -18,7 +18,7 @@ const DeleteScreenDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle id="alert-dialog-title" sx={{ color: "black" }}>
         {"Bu kaydı silmek istediğinize emin misiniz?"}
       </DialogTitle>
       <DialogContent>

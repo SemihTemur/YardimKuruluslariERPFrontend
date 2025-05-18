@@ -11,23 +11,30 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import CategoryIcon from "@mui/icons-material/Category";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { FaHistory } from "react-icons/fa";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
+import LockIcon from "@mui/icons-material/Lock";
+import PersonIcon from "@mui/icons-material/Person";
 
 const menuItems = [
   {
+    name: "DONOR",
     menu: "Bağışçı",
     icon: <PeopleIcon />,
     url: "/donor",
   },
   {
+    name: "DONATION",
     menu: "Bağış",
     icon: <VolunteerActivismIcon />,
     subItems: [
       {
+        name: "CASHDONATION",
         menu: "Nakdi Bağış",
         icon: <AttachMoneyIcon />,
         url: "/donation/cash",
       },
       {
+        name: "INKINDDONATION",
         menu: "Ayni Bağış",
         icon: <CardGiftcardIcon />,
         url: "/donation/inkind",
@@ -36,25 +43,30 @@ const menuItems = [
   },
 
   {
+    name: "FAMILY",
     menu: "Aile",
     icon: <FamilyRestroomIcon />,
     url: "/family",
   },
   {
+    name: "STUDENT",
     menu: "Öğrenci",
     icon: <SchoolIcon />,
     url: "/student",
   },
   {
+    name: "AİD",
     menu: "Yardım",
     icon: <SupportIcon />,
     subItems: [
       {
+        name: "CASHAID",
         menu: "Nakdi Yardım",
         icon: <AttachMoneyIcon />,
         url: "/aid/cash",
       },
       {
+        name: "INKINDAID",
         menu: "Ayni Yardım",
         icon: <CardGiftcardIcon />,
         url: "/aid/inkind",
@@ -62,11 +74,13 @@ const menuItems = [
     ],
   },
   {
+    name: "SCHOLARSHIP",
     menu: "Burs",
     icon: <SavingsIcon />,
     url: "/scholarship",
   },
   {
+    name: "INCOME",
     menu: "Gelirler",
     icon: <TrendingUpIcon />,
     subItems: [
@@ -84,12 +98,14 @@ const menuItems = [
         ],
       },
       {
+        name: "OTHERINCOME",
         menu: "Diğer Gelirleri",
         url: "/income/other",
       },
     ],
   },
   {
+    name: "EXPENSE",
     menu: "Giderler",
     icon: <TrendingDownIcon />,
     subItems: [
@@ -108,24 +124,47 @@ const menuItems = [
         ],
       },
       {
+        name: "OTHEREXPENSE",
         menu: "Diğer Giderler",
         url: "/expense/other",
       },
     ],
   },
   {
+    name: "CATEGORY",
     menu: "Tür",
     icon: <CategoryIcon />,
     url: "/category",
   },
   {
+    name: "INVENTORY",
     menu: "Envanter",
     icon: <InventoryIcon />,
     url: "/inventory",
   },
   {
+    name: "CUSTOMUSER",
+    menu: "Kullanıcı",
+    icon: <PersonIcon />,
+    url: "/user",
+  },
+  {
+    name: "ROLE",
+    menu: "Rol",
+    icon: <SupervisorAccountIcon />,
+    url: "/role",
+  },
+  {
+    name: "AUTHORIZATION",
+    menu: "Yetkilendirme",
+    icon: <LockIcon />,
+    url: "/permission",
+  },
+  {
+    name: "LOG",
     menu: "Log",
     icon: <FaHistory />,
+    url: "/log",
   },
 ];
 

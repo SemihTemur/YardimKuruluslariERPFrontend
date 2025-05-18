@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
-export const useGlobalState = (title, initialValues, setButtonTitle) => {
+export const useGlobalState = (
+  componentName,
+  title,
+  initialValues,
+  setButtonTitle
+) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const { user } = useSelector((state) => state.auth);
 
   const [selectedData, setSelectedData] = useState([]);
 
@@ -19,11 +27,20 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
   const [searchText, setSearchText] = useState("");
   const [screenTitle, setScreenTitle] = useState(null);
 
+  const [isPermission, setIsPermission] = useState(0);
+
   const paginationModel = { page: 0, pageSize: 5 };
 
   useEffect(() => {
     setFilteredRows(data);
   }, [data]);
+
+  const hasRole = (role) => {
+    if (user?.authorities?.includes("ROLE_SUPER_ADMIN")) {
+      return true;
+    }
+    return user?.authorities?.includes(role);
+  };
 
   const updatedDatas = (processData, process) => {
     if (process == "save") {
@@ -55,23 +72,32 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
 
   // Screens
   const openAddScreen = () => {
-    setProcess("create");
-    setScreenTitle(`${title} Ekle`);
-    setButtonTitle("Kaydet");
-    setSelectedData(initialValues);
-    setIsAddOpen(true);
-    setIsUpdatedOpen(false);
+    if (hasRole(`${componentName}_SAVE`)) {
+      setIsPermission(-1);
+      setProcess("create");
+      setScreenTitle(`${title} Ekle`);
+      setButtonTitle("Kaydet");
+      setSelectedData(initialValues);
+      setIsAddOpen(true);
+      setIsUpdatedOpen(false);
+    } else {
+      setIsPermission((prev) => prev + 2);
+    }
   };
 
   const openUpdateScreen = (item, id) => {
-    setProcess("update");
-    setScreenTitle(`${title} Güncelleme`);
-    setButtonTitle("Güncelle");
-    setSelectedId(id);
-    setSelectedData(item);
-    setIsAddOpen(false);
-    setIsUpdatedOpen(true);
-    console.log(selectedData);
+    if (hasRole(`${componentName}_UPDATE`)) {
+      setIsPermission(-1);
+      setProcess("update");
+      setScreenTitle(`${title} Güncelleme`);
+      setButtonTitle("Güncelle");
+      setSelectedId(id);
+      setSelectedData(item);
+      setIsAddOpen(false);
+      setIsUpdatedOpen(true);
+    } else {
+      setIsPermission((prev) => prev + 2);
+    }
   };
 
   const onCloseScreen = () => {
@@ -80,8 +106,13 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
   };
 
   const openDeleteDialog = (id) => {
-    setSelectedId(id);
-    setIsDeletedOpen(true);
+    if (hasRole(`${componentName}_DELETE`)) {
+      setIsPermission(-1);
+      setSelectedId(id);
+      setIsDeletedOpen(true);
+    } else {
+      setIsPermission((prev) => prev + 2);
+    }
   };
 
   const closeDeleteDialog = () => {
@@ -130,5 +161,8 @@ export const useGlobalState = (title, initialValues, setButtonTitle) => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
+    isPermission,
+    user,
+    hasRole,
   };
 };

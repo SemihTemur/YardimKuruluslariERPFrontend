@@ -14,7 +14,6 @@ import "../../styles/table-global.css";
 
 const Inventory = () => {
   const { makeRequest } = useApi();
-
   const [loading, setLoading] = useState(false);
 
   const [filteredRows, setFilteredRows] = useState(null);

@@ -1,15 +1,5 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
 body {
-  height: 100vh;
   background-color: #1e2a38;
-  display: flex;
-  justify-content: center;
 }
 
 .title {
@@ -65,6 +55,12 @@ body {
   color: #ffffff;
   width: 100%;
   font-size: 14px;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .admin-forgot-password {

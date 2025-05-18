@@ -51,7 +51,14 @@ const Scholarship = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Burs", scholarshipInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "SCHOLARSHIP",
+    "Burs",
+    scholarshipInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -161,8 +168,16 @@ const Scholarship = () => {
   ];
 
   useEffect(() => {
-    getScholarshipList();
-  }, []);
+    if (user) {
+      getScholarshipList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getScholarshipList = async () => {

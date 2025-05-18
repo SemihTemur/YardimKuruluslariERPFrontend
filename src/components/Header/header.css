@@ -68,6 +68,16 @@
   fill: #ffff !important;
 }
 
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile {
+  color: #fff;
+}
+
 #logout-icon {
   width: 25px !important;
   height: 25px !important;

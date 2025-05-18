@@ -340,5 +340,25 @@ export const userYup = Yup.object().shape({
     .min(6, "Şifre en az 6 karakter olmalıdır")
     .max(20, "Şifre en fazla 20 karakter olabilir"),
 
-  role: Yup.string().required("Rol seçimi zorunludur"),
+  roleName: Yup.string().required("Rol seçimi zorunludur"),
+});
+
+export const roleYup = Yup.object().shape({
+  roleName: Yup.string()
+    .required("Role girilmelidir!!!")
+    .min(3, "Role en az 3 karakter olmalıdır")
+    .matches(
+      /^[a-zA-Z_-]+$/,
+      "Rol sadece harf, tire (-) ve alt çizgi (_) içerebilir!"
+    ),
+});
+
+export const permissionYup = Yup.object().shape({
+  roleName: Yup.string().required("Role seçmek zorunludur!!!"),
+  entityName: Yup.string().required(
+    "Yetki verilecek alanı seçmek zorunludur!!!"
+  ),
+  actionType: Yup.string().required(
+    "Verilecek yetki türünü seçmek zorunludur!!!"
+  ),
 });

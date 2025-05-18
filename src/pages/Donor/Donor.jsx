@@ -48,7 +48,9 @@ const Donor = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Bağış", donorInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState("DONOR", "Bağış", donorInitialValues, setButtonTitle);
 
   const columns = [
     {
@@ -180,8 +182,16 @@ const Donor = () => {
   ];
 
   useEffect(() => {
-    getDonorList();
-  }, []);
+    if (user) {
+      getDonorList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getDonorList = async () => {

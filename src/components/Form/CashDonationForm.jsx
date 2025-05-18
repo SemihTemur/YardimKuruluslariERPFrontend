@@ -3,6 +3,7 @@ import { Field, ErrorMessage, useFormikContext } from "formik";
 import Label from "../UI/Label/Label";
 import Button from "../UI/Button/Button";
 import useApi from "../../hooks/useApi ";
+import { toast } from "react-hot-toast";
 import { Skeleton, Box } from "@mui/material";
 import Select from "react-select";
 
@@ -30,7 +31,7 @@ const CashDonationForm = ({ process, buttonTitle }) => {
         setDonorData(data);
         setLoading(true);
       } catch (error) {
-        console.error("Veri alınırken hata oluştu", error);
+        toast.error("Veri alınırken hata oluştu", error);
       }
     };
 
@@ -68,9 +69,6 @@ const CashDonationForm = ({ process, buttonTitle }) => {
       values.donorFirstName = donorInfo.value.split(" ")[0];
       values.donorLastName = donorInfo.value.split(" ")[1];
     }
-    console.log(values.donorFirstName);
-    console.log(values.donorLastName);
-    console.log(donorInfo);
   }, [donorInfo]);
 
   const handleChange = (selectedOption) => {

@@ -1,3 +1,5 @@
+import entityName from "../constants/entityName";
+
 export const familyInitialValues = {
   familyName: "",
   familyMemberCount: "",
@@ -111,5 +113,15 @@ export const userInitialValues = {
   username: "",
   email: "",
   password: "",
-  role: "",
+  roleName: "",
+};
+
+export const roleInitialValues = {
+  roleName: "",
+};
+
+export const permissionInitialValues = {
+  roleName: "",
+  entityName: "",
+  actionType: "",
 };

@@ -52,7 +52,14 @@ const CashDonation = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Nakdi Yardım", cashAidInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "CASHAID",
+    "Nakdi Yardım",
+    cashAidInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -154,8 +161,16 @@ const CashDonation = () => {
   ];
 
   useEffect(() => {
-    getCashAidList();
-  }, []);
+    if (user) {
+      getCashAidList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getCashAidList = async () => {

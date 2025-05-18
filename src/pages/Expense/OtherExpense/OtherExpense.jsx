@@ -51,7 +51,14 @@ const OtherExpense = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Gider", otherExpenseInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "OTHEREXPENSE",
+    "Gider",
+    otherExpenseInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -125,8 +132,16 @@ const OtherExpense = () => {
   ];
 
   useEffect(() => {
-    getOtherExpenseList();
-  }, []);
+    if (user) {
+      getOtherExpenseList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getOtherExpenseList = async () => {

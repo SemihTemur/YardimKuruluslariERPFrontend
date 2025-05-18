@@ -32,6 +32,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           {menuItems.map((menuItem, index) => (
             <SidebarItem
               key={index}
+              name={menuItem?.name ?? null}
               menuItem={menuItem}
               setActiveIndex={setActiveIndex}
               activeIndex={activeIndex}

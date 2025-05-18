@@ -10,6 +10,8 @@ const useApi = () => {
         response = await apiService.post(endpoint, values);
       } else if (method === "put") {
         response = await apiService.put(endpoint, values, id);
+      } else if (method === "putWithNoId") {
+        response = await apiService.putWithNoId(endpoint, values);
       } else if (method === "delete") {
         response = await apiService.delete(endpoint, id);
       }

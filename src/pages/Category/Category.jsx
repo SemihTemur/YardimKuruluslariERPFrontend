@@ -49,7 +49,9 @@ const Category = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Tür", categoryInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState("CATEGORY", "Tür", categoryInitialValues, setButtonTitle);
 
   const columns = [
     {
@@ -121,11 +123,20 @@ const Category = () => {
   ];
 
   useEffect(() => {
-    getCategoryList();
-  }, []);
+    if (user) {
+      getCategoryList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getCategoryList = async () => {
+    console.log(user);
     try {
       const response = await makeRequest("get", "getCategoryList");
       setLoading(true);

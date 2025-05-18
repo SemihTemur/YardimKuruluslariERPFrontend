@@ -4,8 +4,14 @@ import axios from "axios";
 export const getCashBalance = createAsyncThunk(
   "cash/getCashBalance",
   async () => {
+    const token = localStorage.getItem("token");
     const response = await axios.get(
-      "http://localhost:8080/rest/api/getTreasuryBalance"
+      "http://localhost:8080/rest/api/getTreasuryBalance",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   }

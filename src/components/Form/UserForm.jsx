@@ -1,26 +1,63 @@
 import React, { useEffect, useState } from "react";
+import { Field, ErrorMessage, useFormikContext } from "formik";
 import Label from "../../components/UI/Label/Label";
 import Button from "../UI/Button/Button";
 import Select from "react-select";
-import { Field, ErrorMessage } from "formik";
+import useApi from "../../hooks/useApi ";
+import { toast } from "react-hot-toast";
 
-const UserForm = ({ buttonTitle }) => {
+const UserForm = ({ process, buttonTitle }) => {
   const { values } = useFormikContext();
 
-  const [role, selectedRole] = useState();
-  const [roles, setRoles] = useState([]);
+  const { makeRequest } = useApi();
+
+  const [roleData, setRoleData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [filteredRole, setFilteredRole] = useState();
+  const [roleInfo, setRoleInfo] = useState();
 
   useEffect(() => {
-    const values = ["SUPER_ADMIN,ADMIN,PERSONEL"];
-    setRoles(values);
+    const roleNames = async () => {
+      try {
+        const data = await makeRequest("get", "getRoles");
+        setRoleData(data);
+        setLoading(true);
+      } catch (error) {
+        toast.error("Veri alınırken hata oluştu", error);
+      }
+    };
+    roleNames();
   }, []);
 
   useEffect(() => {
-    values.role = role;
-  }, [role]);
+    if (loading) {
+      const roleNames = roleData.map((role) => ({
+        value: role,
+        label: role,
+      }));
+      setFilteredRole(roleNames);
+
+      if (process === "update") {
+        values.password = "";
+        const item = {
+          value: values.roleName,
+          label: values.roleName,
+        };
+        setRoleInfo(item);
+      }
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (loading && roleInfo) {
+      values.roleName = roleInfo.value;
+      console.log(values);
+    }
+  }, [roleInfo]);
 
   const handleRole = (selectedOption) => {
-    selectedRole(selectedOption);
+    setRoleInfo(selectedOption);
   };
 
   return (
@@ -54,13 +91,13 @@ const UserForm = ({ buttonTitle }) => {
         <div className="form-container__content__input-group">
           <Select
             className="form__select"
-            value={role}
+            value={roleInfo}
             onChange={handleRole}
-            options={roles}
+            options={filteredRole}
             isSearchable={true}
             placeholder="Rol seçiniz"
           />
-          <ErrorMessage name="role" component="p" className="input-error" />
+          <ErrorMessage name="roleName" component="p" className="input-error" />
         </div>
       </div>
 

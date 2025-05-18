@@ -49,7 +49,14 @@ const InKindDonation = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Ayni Bağış", inKindDonationInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "INKINDDONATION",
+    "Ayni Bağış",
+    inKindDonationInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -149,8 +156,16 @@ const InKindDonation = () => {
   ];
 
   useEffect(() => {
-    getInKindDonationList();
-  }, []);
+    if (user) {
+      getInKindDonationList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getInKindDonationList = async () => {

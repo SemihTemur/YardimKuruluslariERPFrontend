@@ -51,7 +51,14 @@ const OtherIncome = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Gelir", otherIncomeInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "OTHERINCOME",
+    "Gelir",
+    otherIncomeInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -123,11 +130,17 @@ const OtherIncome = () => {
         }
       : {},
   ];
-
-  // list
   useEffect(() => {
-    getOtherIncomeList();
-  }, []);
+    if (user) {
+      getOtherIncomeList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   const getOtherIncomeList = async () => {
     try {

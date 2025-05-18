@@ -48,7 +48,9 @@ const Family = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Aile", familyInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState("FAMILY", "Aile", familyInitialValues, setButtonTitle);
 
   const columns = [
     {
@@ -172,10 +174,17 @@ const Family = () => {
       : {},
   ];
 
-  // list
   useEffect(() => {
-    getFamilyList();
-  }, []);
+    if (user) {
+      getFamilyList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   const getFamilyList = async () => {
     try {

@@ -48,7 +48,14 @@ const InKindAid = () => {
     openDeleteDialog,
     closeDeleteDialog,
     handleSearch,
-  } = useGlobalState("Ayni Yardım", inKindAidInitialValues, setButtonTitle);
+    isPermission,
+    user,
+  } = useGlobalState(
+    "INKINDAID",
+    "Ayni Yardım",
+    inKindAidInitialValues,
+    setButtonTitle
+  );
 
   const columns = [
     {
@@ -171,8 +178,16 @@ const InKindAid = () => {
   ];
 
   useEffect(() => {
-    getInKindAidList();
-  }, []);
+    if (user) {
+      getInKindAidList();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isPermission && isPermission != -1) {
+      toast.error("Yetkiniz bulunmamaktadır!!!");
+    }
+  }, [isPermission]);
 
   // list
   const getInKindAidList = async () => {
