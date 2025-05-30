@@ -20,7 +20,6 @@ import ScholarshipExpense from "../pages/Expense/ScholarshipExpense/ScholarshipE
 import InKindAidExpense from "../pages/Expense/AidExpense/InKindAidExpense";
 import Login from "../pages/Login/Login";
 import ForgotPassword from "../pages/Login/ForgotPassword";
-import Home from "../pages/Home/Home";
 import Role from "../pages/Role/Role";
 import User from "../pages/User/User";
 import Permission from "../pages/Permission/Permission";
@@ -28,6 +27,7 @@ import Unauthorized from "../pages/Unauthorized/Unauthorized";
 import PrivateRouter from "./PrivateRouter";
 import Profil from "../pages/Profil/Profil";
 import Log from "../pages/Log/Log";
+import Home from "../pages/Home/Home";
 
 export const RouterConfig = () => {
   const { user } = useSelector((state) => state.auth);

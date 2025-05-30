@@ -41,10 +41,14 @@ const Table = ({
             <Box className="paper-actions">
               <Box className="paper-export__container">
                 <Tooltip title="Excel" placement="top">
-                  <RiFileExcel2Fill id="excel" onClick={exportToExcel} />
+                  <span>
+                    <RiFileExcel2Fill id="excel" onClick={exportToExcel} />
+                  </span>
                 </Tooltip>
                 <Tooltip title="Pdf" placement="top">
-                  <FaFilePdf id="pdf" onClick={exportToPDF} />
+                  <span>
+                    <FaFilePdf id="pdf" onClick={exportToPDF} />
+                  </span>
                 </Tooltip>
               </Box>
               <Box className="paper-actions__search">

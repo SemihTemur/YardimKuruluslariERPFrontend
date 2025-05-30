@@ -12,6 +12,8 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     setCollapsed(true);
   };
 
+  console.log(collapsed);
+
   return (
     <div className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
       <MdArrowForwardIos

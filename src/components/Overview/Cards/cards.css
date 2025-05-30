@@ -1,0 +1,51 @@
+.card {
+  background: #1f2937; /* Daha koyu ama kontrastlı bir gri */
+  padding: 24px;
+  border-radius: 20px;
+  width: 280px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  color: #93c5fd !important; /* Açık mavi */
+  font-size: 40px !important;
+  background-color: rgba(147, 197, 253, 0.15); /* Açık mavi arka plan */
+  border-radius: 50%;
+  padding: 10px;
+}
+
+.stat-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.stat-description {
+  font-size: 12px;
+  color: #94a3b8;
+}

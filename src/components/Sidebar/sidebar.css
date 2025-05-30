@@ -1,4 +1,3 @@
-
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -13,12 +12,11 @@
   overflow: auto;
 }
 
-
 .sidebar--collapsed {
   width: 0px !important;
 }
 
-.closeMenu{
+.closeMenu {
   position: absolute;
   left: 82%;
   top: 70px;
@@ -28,7 +26,7 @@
   display: none;
 }
 
-.closeMenu--collapsed{
+.closeMenu--collapsed {
   visibility: hidden;
 }
 
@@ -73,14 +71,14 @@
 }
 
 @media screen and (max-width: 768px) {
-  .sidebar{
+  .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    z-index:2;
+    z-index: 2;
   }
-  .closeMenu{
+  .closeMenu {
     display: block;
   }
 }
